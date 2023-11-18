@@ -28,7 +28,7 @@ if response.status_code == 200:
         invoice_data = {
             'customer': customer_id,  # ID do cliente
             'billingType': 'BOLETO',  # Pode ser 'BOLETO' ou 'CREDIT_CARD'
-            'value': 10,  # Valor da cobrança
+            'value': 10.50,  # Valor da cobrança
             'dueDate': '2023-12-02',  # Data de vencimento
             'description': 'Cobrança para cliente',
         }
