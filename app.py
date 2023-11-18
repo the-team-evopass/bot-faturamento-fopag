@@ -6,6 +6,11 @@ import signal
 app = Flask(__name__)
 
 @app.route('/')
+def home():
+    return 'Bot online'
+
+
+@app.route('/run')
 def executar_bot():
     criarcobranca
     print('Encerrando a aplicação...')
@@ -19,5 +24,4 @@ def encerrar_servidor():
 
 # Rodar a API
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run()
