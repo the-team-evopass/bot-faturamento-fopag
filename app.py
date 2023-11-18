@@ -5,12 +5,12 @@ import signal
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.get('/')
 def home():
     return 'Bot online'
 
 
-@app.route('/run')
+@app.get('/run')
 def executar_bot():
     criarcobranca
     print('Encerrando a aplicação...')
