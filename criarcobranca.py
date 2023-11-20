@@ -27,13 +27,13 @@ if response.status_code == 200:
         customer_name = customer['name']
         invoice_data = {
             'customer': customer_id,  # ID do cliente
-            'billingType': 'BOLETO',  # Pode ser 'BOLETO' ou 'CREDIT_CARD'
-            'value': 10.50,  # Valor da cobrança
-            'dueDate': '2023-12-02',  # Data de vencimento
+            'billingType': 'BOLETO',  #BOLETO = FOPAG
+            'value': 10.50,  # Valor da cobrança            (Substituir pelo valor no banco de dados)
+            'dueDate': '2023-12-02',  # Data de vencimento  (Substituir pelo valor no banco de dados)
             'description': 'Cobrança para cliente',
         }
 
-        #Criar a cobrança dos clientes
+        #Criar a cobrança para os clientes
         invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
 
         if invoice_response.status_code == 200:
