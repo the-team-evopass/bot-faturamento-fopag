@@ -10,15 +10,14 @@ def ListaEmpresas(urlListagemEmpresas):
 
         if respostaListagemEmpresas.status_code == 200:
             empresas = respostaListagemEmpresas.json()
-    
-            lista_empresas = empresas['data']
+            listaEmpresas = empresas['data']
             print("Lista de Empresas:")
 
-            for empresa in lista_empresas:
-                nome_empresa = empresa['tradeName']
-                print(nome_empresa)
-            
-            return lista_empresas
+            for empresa in listaEmpresas:
+                empresa_tradeName = empresa['tradeName']
+                empresa_id = empresa['id']
+                print(empresa_id, empresa_tradeName)
+            return listaEmpresas
 
         else:
             print(f"Erro na requisição. Código de Status: {respostaListagemEmpresas.status_code}")
@@ -35,7 +34,8 @@ def ListaFuncionarios(urlListaFuncionarios):
         if respostaListagemFuncionarios.status_code == 200:
             funcionarios = respostaListagemFuncionarios.json()
             empresas = ListaEmpresas(urlListagemEmpresas)
-
+            print("")
+            print("Lista de funcionários por empresas:")
             for funcionariosFiltrados in funcionarios:
                 funcionariosFiltrados_statusReason = funcionariosFiltrados['statusReason']
 
@@ -43,12 +43,12 @@ def ListaFuncionarios(urlListaFuncionarios):
                     funcionariosFiltrados_Id = funcionariosFiltrados['id']
 
                     empresasCorrespondentes = [empresa for empresa in empresas if empresa['id'] == funcionariosFiltrados_Id]
-
+                    
                     if empresasCorrespondentes:
                         for empresaCorrespondente in empresasCorrespondentes:
                             nomeEmpresaCorrespondente = empresaCorrespondente['tradeName']
                             funcionariosFiltrados_firstName = funcionariosFiltrados['firstName']
-                            print(f"Nome dos funcionários da empresa {nomeEmpresaCorrespondente}: {funcionariosFiltrados_firstName}")
+                            print(f"Funcionários da empresa {nomeEmpresaCorrespondente}: {funcionariosFiltrados_firstName}")
                     else:
                         print(f"O funcionário {funcionariosFiltrados['firstName']} não está cadastrado em uma empresa.")
 
@@ -56,4 +56,4 @@ def ListaFuncionarios(urlListaFuncionarios):
         print(f"Erro: {e}")
 
 if __name__ == "__main__":
-    ListaFuncionarios(urlListaFuncionarios)
+    ListaFuncionarios(urlListaFuncionarios)a
