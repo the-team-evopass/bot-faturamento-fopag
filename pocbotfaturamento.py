@@ -56,4 +56,4 @@ def ListaFuncionarios(urlListaFuncionarios):
         print(f"Erro: {e}")
 
 if __name__ == "__main__":
-    ListaFuncionarios(urlListaFuncionarios)a
+    ListaFuncionarios(urlListaFuncionarios)
