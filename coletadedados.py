@@ -63,12 +63,12 @@ else:
 #     contagem_por_empresa = {}
 
 #     for student in allStudents:
-#         statusReason = student['statusReason']
+#         status = student['status']
 #         status = student['status']
 #         funcionario_id = student['id']
 #         empresa_id = student['id']
 
-#         if statusReason == "Ativo":
+#         if status == "Ativo":
 #             nome_empresa = next((empresa['tradeName'] for empresa in listaEmpresas if empresa['id'] == empresa_id), None)
 
 #             if nome_empresa:
