@@ -4,6 +4,8 @@ import requests
 urlAllCompany = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements'
 urlAllStudent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress'
 urlAgreementStudent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/student_agreement'
+urlAllDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent/'
+urlAgreementDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent_agreement'
 
 # Listagem de Empresas
 respostaAllCompany = requests.get(urlAllCompany)
@@ -63,4 +65,41 @@ if respostaAllStudents.status_code == 200:
         print("Nenhum funcionário Ativo encontrado nas empresas em implantação.")
 
 else:
-    print(f"Erro na requisição. Código de Status: {respostaAllStudents.status_code}, {respostaAgreementStudents.status_code}")
+    print(f"Erro na requisição. Código de Status: {respostaAllStudents.status_code}, {respostaAllStudents.status_code}")
+
+
+# Listagem de dependentes Ativos por empresa
+respostaAllDependents = requests.get(urlAllDependent)
+respostaAgreementDependent = requests.get(urlAgreementDependent)
+
+if respostaAllDependents.status_code == 200:
+    allDependents = respostaAllDependents.json()
+
+    # Dict para armazenar a contagem de funcionários por empresa
+    contagem_por_empresa = {}
+
+    for dependent in allDependents:
+        statusReason = dependent['statusReason']
+        status = dependent['status']
+        dependente_id = dependent['id']
+        empresa_id = dependent['id']
+        dependent_status = dependent['status']
+
+        if statusReason == "Ativo":
+            nome_empresa = next((empresa['tradeName'] for empresa in listaEmpresas if empresa['id'] == empresa_id), None)
+
+            if nome_empresa:
+                
+                # Atualizar a contagem para a empresa correspondente
+                contagem_por_empresa[nome_empresa] = contagem_por_empresa.get(nome_empresa, 0) + 1
+
+    print("\nQuantidade de dependentes Ativo por empresa em implantação:")
+    if contagem_por_empresa:
+        for empresa, contagem in contagem_por_empresa.items():
+            print(f"{empresa}: {contagem} dependente(s)")
+    else:
+        print("Nenhum dependente Ativo encontrado nas empresas em implantação.")
+
+else:
+    print(f"Erro na requisição. Código de Status: {respostaAllDependents.status_code}, {respostaAllDependents.status_code}")
+
