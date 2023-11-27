@@ -1,10 +1,10 @@
 import requests
 
 #URLS DAS APIS
-urlListagemCompany = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/prod/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements'
-urlListagemStudent = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/prod/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress'
-urlListagemDependent = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/prod/dependent/'
-urlListagemAgreementStudent = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/prod/student_agreement'
+urlListagemCompany = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements'
+urlListagemStudent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress'
+urlListagemDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent/'
+urlListagemAgreementStudent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/student_agreement'
 
 #FUNÇÃO DE LISTAGEM DE EMPRESA
 def ListagemEmpresas(urlListagemCompany):
@@ -39,8 +39,6 @@ def ListagemEmpresas(urlListagemCompany):
     except Exception as e:
         print(f"Erro: {e}")
         return []
-
-# ... (código anterior)
 
 # FUNÇÃO DE LISTAGEM DE FUNCIONÁRIOS
 def ListagemFuncionarios(urlListagemStudent, urlListagemCompany):
