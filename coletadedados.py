@@ -30,6 +30,9 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
     dependentJson = respostaAllDependent.json()
     listaDependentes = dependentJson['data']
 
+    # studentJson = respostaAllStudents.json()
+    # listaAtivos = studentJson['data']
+
     # Contador de empresas
     contagem_empresas_implantacao = 0
 
@@ -44,6 +47,7 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
         # Contador de titulares e dependentes
         contagem_titulares_empresa = 0
         contagem_dependentes_empresa = 0
+        #contagem_ativos_empresa = 0
 
         # Lógica para filtrar apenas as empresas ativas
         if empresa_companyStatus == "Ativo":
@@ -63,9 +67,8 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
 
                         if titular_status == "true" and titular_studentAgreement_type == "F":
                             contagem_titulares_empresa += 1
-                        
-
-
+                    
+                        #Filtro para verificar a quantidade de dependentes ativos na empresa 
                         for dependente in listaDependentes:
                             dependente_companyCNPJ = dependente['company']['cnpj']
                             if dependente_companyCNPJ == empresa_cnpj:
@@ -78,15 +81,24 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
                         # Calcula a relação de ativos das empresas
                         relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
 
-                
-
                 # Data de vencimento da cobrança
                 calcular_data_vencimento # Data de vencimento (data corte + 10)
 
-            
-                    
-                
     print("")
 
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
+
+
+
+
+#ANOTAÇÕES PARA LISTA DE ATIVOS
+
+# for ativos in listaAtivos:
+#     ativos_companyCNPJ = ativos['company']['cnpj']
+#     if ativos_companyCNPJ == empresa_cnpj:
+#         ativos_status = ativos['status']
+#         ativos_studentAgreement_type = ativos['studentAgreement']['type']
+
+#         if ativos_status == "true" and ativos_studentAgreement_type == "F":
+#             contagem_ativos_empresa += 1
