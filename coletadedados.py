@@ -9,15 +9,21 @@ urlAllDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/de
 urlAgreementDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent_agreement'
 
 #Obter a data atual
-dia_atual = 1
+# dia_atual = datetime.now().day
+dia_atual = 30
 
 print(dia_atual)
 
 # Listagem de Empresas e a data corte
 respostaAllCompany = requests.get(urlAllCompany)
-if respostaAllCompany.status_code == 200:
+respostaAllStudents = requests.get(urlAllStudent)
+if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 200:
     companyJson = respostaAllCompany.json()
     listaEmpresas = companyJson['data']
+
+    studentJson = respostaAllStudents.json()
+    listaFuncionarios = studentJson['data']
+
     print("Lista de Empresas em Implantação:")
     contagem_empresas_implantacao = 0
 
@@ -27,22 +33,33 @@ if respostaAllCompany.status_code == 200:
         empresa_tradeName = empresa['tradeName']
         empresa_companyStatus = empresa['companyStatus']
         empresa_cutoffDate = empresa['cutoffDate']
+        empresa_companyAgreements_value = empresa['companyAgreements']['value']
 
         # Lógica para filtrar apenas as empresas que estão em implantação
         if empresa_companyStatus == "EM IMPLANTACAO":
-            print(f"CNPJ: {empresa_cnpj}    Nome: {empresa_tradeName}   Data corte:{empresa_cutoffDate}") 
+            #print(f"CNPJ: {empresa_cnpj}    Nome: {empresa_tradeName}   Data corte:{empresa_cutoffDate}") 
             contagem_empresas_implantacao += 1
             
-            #Verifica a Data Corte das empresas
+            #Filtro das empresas que tem a data corte igual ao dia atual
             if dia_atual == empresa_cutoffDate:
                 print(f"A empresa {empresa_tradeName} tem a data corte igual a data atual.")
 
-                #Verifica a quantidade de Ativos nas empresas
+                #Filtro para verificar a quantidade de funcionarios ativos na empresa
+                for funcionario in listaFuncionarios:
+                    funcionario_id = funcionario['id']
+                    funcionario_status = funcionario['status']
+                    funcionario_companyCNPJ = funcionario['company']['cnpj']
+                    funcionario_studentAgreement_type = funcionario['studentAgreement']['type']
+                    contagem_funcionarios_empresa = 0
 
-
+                    if funcionario_status == "true" and funcionario_studentAgreement_type == "F":
+                        contagem_funcionarios_empresa += 1
+                    else:
+                        print("Sem funcionários Fopag ativos")
 
                     #Calcula a relação de ativos das empresas
-
+                    relacao_ativos = contagem_funcionarios_empresa * empresa_companyAgreements_value
+                    
 
                     
                 
