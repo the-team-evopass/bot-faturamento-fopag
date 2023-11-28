@@ -59,9 +59,10 @@ if respostaAllCompany.status_code == 200:
 
                 #Filtro para verificar a quantidade de titulares ativos na empresa
                 for titular in listaTitulares:
-                    try:
+                    try: #Comparar para ver se o cpnj da empresa do titular é igual ao cnpj da empresa atual
                         titular_firstName = titular['firstName']
                         titular_companyCNPJ = titular['company']['cnpj']
+                        
                         if titular_companyCNPJ == empresa_cnpj:
                             titular_status = titular['status']
                             titular_studentAgreement_type = titular['studentAgreement'],['type']
@@ -71,7 +72,7 @@ if respostaAllCompany.status_code == 200:
                         
                             #Filtro para verificar a quantidade de dependentes ativos na empresa 
                             for dependente in listaDependentes:
-                                dependente_companyCNPJ = dependente['company'],['cnpj']
+                                dependente_companyCNPJ = dependente['company']['cnpj']
                                 if dependente_companyCNPJ == empresa_cnpj:
                                     dependente_status = dependente['status']
                                     dependente_dependentAgreement_type = dependente['dependentAgreement'],['type']
@@ -82,11 +83,11 @@ if respostaAllCompany.status_code == 200:
                             # Calcula a relação de ativos das empresas
                             relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
                     except KeyError:
-                        print("O titular {titular_firstName}, não tem company nas suas chaves")
+                        print(f"O titular {titular_firstName}, não tem company nas suas chaves")
 
 
                         
-                        
+
                 # Data de vencimento da cobrança
                 calcular_data_vencimento # Data de vencimento (data corte + 10)
         else:
