@@ -1,5 +1,7 @@
 # CRIANDO COBRANÇA PARA TODOS OS CLIENTES DO ASAAS
 import requests
+from coletadedados import relacao_ativos
+from datavencimento import calcular_data_vencimento
 
 #Api do asaas
 api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoXzU5ODI0NzYxLTBiNGQtNDQwNC1iZTAxLWM1OTAyOTQ2NGRlZg=='
@@ -28,8 +30,8 @@ if response.status_code == 200:
         invoice_data = {
             'customer': customer_id,  # ID do cliente
             'billingType': 'BOLETO',  #BOLETO = FOPAG
-            'value': 10.50,  # Valor da cobrança            (Substituir pelo valor no banco de dados)
-            'dueDate': '2023-12-02',  # Data de vencimento  (Substituir pelo valor no banco de dados)
+            'value': relacao_ativos,  # Valor da cobrança            (Substituir pelo valor no banco de dados)
+            'dueDate': calcular_data_vencimento(),  # Data de vencimento  (Substituir pelo valor no banco de dados)
             'description': 'Cobrança para cliente',
         }
 

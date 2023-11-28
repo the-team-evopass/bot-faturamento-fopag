@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-import datavencimento
+from datavencimento import calcular_data_vencimento
 
 # URLs DAS APIs
 urlAllCompany = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements'
@@ -62,7 +62,7 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
                     relacao_ativos = contagem_funcionarios_empresa * empresa_companyAgreements_value
 
                     #Data de vencimento da cobrança
-                    datavencimento #data_final_formatada para ter a data de vencimento (data corte + 10)
+                    calcular_data_vencimento #data de vencimento (data corte + 10)
 
             
                     

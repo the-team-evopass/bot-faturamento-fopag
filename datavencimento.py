@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-def calcular_data_final(empresa_cutoffDate, dias_adicionais):
+def calcular_data_vencimento(empresa_cutoffDate, dias_adicionais):
     # Obtém a data atual
     data_atual = datetime.now()
 
