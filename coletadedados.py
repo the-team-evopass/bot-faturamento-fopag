@@ -10,7 +10,6 @@ urlAllDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/de
 urlAgreementDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent_agreement'
 
 #Obter a data atual
-# dia_atual = datetime.now().day
 dia_atual = 30
 
 print(dia_atual)
@@ -20,15 +19,15 @@ respostaAllCompany = requests.get(urlAllCompany)
 respostaAllStudents = requests.get(urlAllStudent)
 respostaAllDependent = requests.get(urlAllDependent)
 
-if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 200 and respostaAllDependent == 200:
+if respostaAllCompany.status_code == 200:
     companyJson = respostaAllCompany.json()
     listaEmpresas = companyJson['data']
 
     studentJson = respostaAllStudents.json()
-    listaTitulares = studentJson['data']
+    listaTitulares = studentJson
 
     dependentJson = respostaAllDependent.json()
-    listaDependentes = dependentJson['data']
+    listaDependentes = dependentJson
 
     # studentJson = respostaAllStudents.json()
     # listaAtivos = studentJson['data']
@@ -42,7 +41,7 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
         empresa_tradeName = empresa['tradeName'] # Nome da empresa
         empresa_companyStatus = empresa['companyStatus'] # Status da empresa
         empresa_cutoffDate = empresa['cutoffDate'] # Data corte
-        empresa_companyAgreements_value = empresa['companyAgreements']['value'] #Valor que a empresa paga
+        empresa_companyAgreements_value = empresa['companyAgreements'],['value'] #Valor que a empresa paga
 
         # Contador de titulares e dependentes
         contagem_titulares_empresa = 0
@@ -50,7 +49,7 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
         #contagem_ativos_empresa = 0
 
         # Lógica para filtrar apenas as empresas ativas
-        if empresa_companyStatus == "Ativo":
+        if empresa_companyStatus == "EM IMPLANTACAO":
             # print(f"CNPJ: {empresa_cnpj}    Nome: {empresa_tradeName}   Data corte:{empresa_cutoffDate}") 
             contagem_empresas_implantacao += 1
             
@@ -60,30 +59,38 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
 
                 #Filtro para verificar a quantidade de titulares ativos na empresa
                 for titular in listaTitulares:
-                    titular_companyCNPJ = titular['company']['cnpj']
-                    if titular_companyCNPJ == empresa_cnpj:
-                        titular_status = titular['status']
-                        titular_studentAgreement_type = titular['studentAgreement']['type']
+                    try:
+                        titular_firstName = titular['firstName']
+                        titular_companyCNPJ = titular['company']['cnpj']
+                        if titular_companyCNPJ == empresa_cnpj:
+                            titular_status = titular['status']
+                            titular_studentAgreement_type = titular['studentAgreement'],['type']
 
-                        if titular_status == "true" and titular_studentAgreement_type == "F":
-                            contagem_titulares_empresa += 1
-                    
-                        #Filtro para verificar a quantidade de dependentes ativos na empresa 
-                        for dependente in listaDependentes:
-                            dependente_companyCNPJ = dependente['company']['cnpj']
-                            if dependente_companyCNPJ == empresa_cnpj:
-                                dependente_status = dependente['status']
-                                dependente_dependentAgreement_type = dependente['dependentAgreement']['type']
+                            if titular_status == "true" and titular_studentAgreement_type == "F":
+                                contagem_titulares_empresa += 1
+                        
+                            #Filtro para verificar a quantidade de dependentes ativos na empresa 
+                            for dependente in listaDependentes:
+                                dependente_companyCNPJ = dependente['company'],['cnpj']
+                                if dependente_companyCNPJ == empresa_cnpj:
+                                    dependente_status = dependente['status']
+                                    dependente_dependentAgreement_type = dependente['dependentAgreement'],['type']
 
-                                if dependente_status == "true" and dependente_dependentAgreement_type == "F":
-                                    contagem_dependentes_empresa += 1
+                                    if dependente_status == "true" and dependente_dependentAgreement_type == "F":
+                                        contagem_dependentes_empresa += 1
 
-                        # Calcula a relação de ativos das empresas
-                        relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
+                            # Calcula a relação de ativos das empresas
+                            relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
+                    except KeyError:
+                        print("O titular {titular_firstName}, não tem company nas suas chaves")
 
+
+                        
+                        
                 # Data de vencimento da cobrança
                 calcular_data_vencimento # Data de vencimento (data corte + 10)
-
+        else:
+            print(f"A empresa {empresa_tradeName}, não está ativa")
     print("")
 
 else:
