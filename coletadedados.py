@@ -18,51 +18,70 @@ print(dia_atual)
 # Listagem de Empresas e a data corte
 respostaAllCompany = requests.get(urlAllCompany)
 respostaAllStudents = requests.get(urlAllStudent)
-if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 200:
+respostaAllDependent = requests.get(urlAllDependent)
+
+if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 200 and respostaAllDependent == 200:
     companyJson = respostaAllCompany.json()
     listaEmpresas = companyJson['data']
 
     studentJson = respostaAllStudents.json()
-    listaFuncionarios = studentJson['data']
+    listaTitulares = studentJson['data']
 
-    print("Lista de Empresas em Implantação:")
+    dependentJson = respostaAllDependent.json()
+    listaDependentes = dependentJson['data']
+
+    # Contador de empresas
     contagem_empresas_implantacao = 0
 
     # Loop para coletar dados das empresas
     for empresa in listaEmpresas:
-        empresa_cnpj = empresa['cnpj']
-        empresa_tradeName = empresa['tradeName']
-        empresa_companyStatus = empresa['companyStatus']
-        empresa_cutoffDate = empresa['cutoffDate']
-        empresa_companyAgreements_value = empresa['companyAgreements']['value']
+        empresa_cnpj = empresa['cnpj'] # Cnpj da empresa
+        empresa_tradeName = empresa['tradeName'] # Nome da empresa
+        empresa_companyStatus = empresa['companyStatus'] # Status da empresa
+        empresa_cutoffDate = empresa['cutoffDate'] # Data corte
+        empresa_companyAgreements_value = empresa['companyAgreements']['value'] #Valor que a empresa paga
 
-        # Lógica para filtrar apenas as empresas que estão em implantação
-        if empresa_companyStatus == "EM IMPLANTACAO":
-            #print(f"CNPJ: {empresa_cnpj}    Nome: {empresa_tradeName}   Data corte:{empresa_cutoffDate}") 
+        # Contador de titulares e dependentes
+        contagem_titulares_empresa = 0
+        contagem_dependentes_empresa = 0
+
+        # Lógica para filtrar apenas as empresas ativas
+        if empresa_companyStatus == "Ativo":
+            # print(f"CNPJ: {empresa_cnpj}    Nome: {empresa_tradeName}   Data corte:{empresa_cutoffDate}") 
             contagem_empresas_implantacao += 1
             
-            #Filtro das empresas que tem a data corte igual ao dia atual
+            # Filtro das empresas que tem a data corte igual ao dia atual
             if dia_atual == empresa_cutoffDate:
                 print(f"A empresa {empresa_tradeName} tem a data corte igual a data atual.")
 
-                #Filtro para verificar a quantidade de funcionarios ativos na empresa
-                for funcionario in listaFuncionarios:
-                    funcionario_id = funcionario['id']
-                    funcionario_status = funcionario['status']
-                    funcionario_companyCNPJ = funcionario['company']['cnpj']
-                    funcionario_studentAgreement_type = funcionario['studentAgreement']['type']
-                    contagem_funcionarios_empresa = 0
+                #Filtro para verificar a quantidade de titulares ativos na empresa
+                for titular in listaTitulares:
+                    titular_companyCNPJ = titular['company']['cnpj']
+                    if titular_companyCNPJ == empresa_cnpj:
+                        titular_status = titular['status']
+                        titular_studentAgreement_type = titular['studentAgreement']['type']
 
-                    if funcionario_status == "true" and funcionario_studentAgreement_type == "F":
-                        contagem_funcionarios_empresa += 1
-                    else:
-                        print("Sem funcionários Fopag ativos")
+                        if titular_status == "true" and titular_studentAgreement_type == "F":
+                            contagem_titulares_empresa += 1
+                        
 
-                    #Calcula a relação de ativos das empresas
-                    relacao_ativos = contagem_funcionarios_empresa * empresa_companyAgreements_value
 
-                    #Data de vencimento da cobrança
-                    calcular_data_vencimento #data de vencimento (data corte + 10)
+                        for dependente in listaDependentes:
+                            dependente_companyCNPJ = dependente['company']['cnpj']
+                            if dependente_companyCNPJ == empresa_cnpj:
+                                dependente_status = dependente['status']
+                                dependente_dependentAgreement_type = dependente['dependentAgreement']['type']
+
+                                if dependente_status == "true" and dependente_dependentAgreement_type == "F":
+                                    contagem_dependentes_empresa += 1
+
+                        # Calcula a relação de ativos das empresas
+                        relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
+
+                
+
+                # Data de vencimento da cobrança
+                calcular_data_vencimento # Data de vencimento (data corte + 10)
 
             
                     
@@ -71,72 +90,3 @@ if respostaAllCompany.status_code == 200 and respostaAllStudents.status_code == 
 
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
-
-
-# # Listagem de funcionários Ativos por empresa
-# respostaAllStudents = requests.get(urlAllStudent)
-# respostaAgreementStudents = requests.get(urlAgreementStudent)
-
-# if respostaAllStudents.status_code == 200:
-#     allStudents = respostaAllStudents.json()
-
-#     # Dict para armazenar a contagem de funcionários por empresa
-#     contagem_por_empresa = {}
-
-#     for student in allStudents:
-#         status = student['status']
-#         status = student['status']
-#         funcionario_id = student['id']
-#         empresa_id = student['id']
-
-#         if status == "Ativo":
-#             nome_empresa = next((empresa['tradeName'] for empresa in listaEmpresas if empresa['id'] == empresa_id), None)
-
-#             if nome_empresa:
-#                 # Atualizar a contagem para a empresa correspondente
-#                 contagem_por_empresa[nome_empresa] = contagem_por_empresa.get(nome_empresa, 0) + 1
-
-#     print("\nQuantidade de funcionários Ativo por empresa em implantação:")
-#     if contagem_por_empresa:
-#         for empresa, contagem in contagem_por_empresa.items():
-#             print(f"{empresa}: {contagem} funcionário(s)")
-#     else:
-#         print("Nenhum funcionário Ativo encontrado nas empresas em implantação.")
-
-# else:
-#     print(f"Erro na requisição. Código de Status: {respostaAllStudents.status_code}, {respostaAllStudents.status_code}")
-
-
-# # Listagem de dependentes Ativos por empresa
-# respostaAllDependents = requests.get(urlAllDependent)
-# respostaAgreementDependent = requests.get(urlAgreementDependent)
-
-# if respostaAllDependents.status_code == 200:
-#     allDependents = respostaAllDependents.json()
-
-#     # Dict para armazenar a contagem de funcionários por empresa
-#     contagem_por_empresa = {}
-
-#     for dependent in allDependents:
-#         statusReason = dependent['statusReason']
-#         status = dependent['status']
-#         dependente_id = dependent['id']
-#         empresa_id = dependent['id']
-
-#         if statusReason == "Ativo":
-#             nome_empresa = next((empresa['tradeName'] for empresa in listaEmpresas if empresa['id'] == empresa_id), None)
-
-#             if nome_empresa:
-#                 # Atualizar a contagem para a empresa correspondente
-#                 contagem_por_empresa[nome_empresa] = contagem_por_empresa.get(nome_empresa, 0) + 1
-
-#     print("\nQuantidade de dependentes Ativo por empresa em implantação:")
-#     if contagem_por_empresa:
-#         for empresa, contagem in contagem_por_empresa.items():
-#             print(f"{empresa}: {contagem} dependente(s)")
-#     else:
-#         print("Nenhum dependente Ativo encontrado nas empresas em implantação.")
-
-# else:
-#     print(f"Erro na requisição. Código de Status: {respostaAllDependents.status_code}, {respostaAllDependents.status_code}")
-
