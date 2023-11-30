@@ -86,60 +86,64 @@ if respostaAllCompany.status_code == 200:
                                 if dependente_status == True:
                                     total_dependentes_titular += 1 
                             
-                            print(f"O {titular_firstName} tem {total_dependentes_titular} dependentes")
+                print(f"O {titular_firstName} tem {total_dependentes_titular} dependentes")
 
-                            data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate) #Data Emissão do Boleto | 2023-10-30
-                            entrada_aluno = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
-                            data_emissao_date = data_emissao.date() #Emissão em Data 02/10/2023
-                            entrada_aluno_date = entrada_aluno.date() #Entrada de aluno em Data 01/10/2023
+                data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate) #Data Emissão do Boleto | 2023-10-30
+                entrada_aluno = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
+                data_emissao_date = data_emissao.date() #Emissão em Data 02/10/2023
+                entrada_aluno_date = entrada_aluno.date() #Entrada de aluno em Data 01/10/2023
 
-                            valor_por_dia=2.663 #valor cobrado por dia
-                            data_corte = empresa_cutoffDate # Data Corte
-                            emissao_menos_mes = data_emissao_date - timedelta(days=30) #Emissão de boleto - 30 dias
-                            valor_pro_rata = 0.0 #Contador float
+                valor_por_dia=2.663 #valor cobrado por dia
+                data_corte = empresa_cutoffDate # Data Corte
+                emissao_menos_mes = data_emissao_date - timedelta(days=30) #Emissão de boleto - 30 dias
+                valor_pro_rata = 0.0 #Contador float
 
 
-                            print(f"Competência: {data_emissao_date}")
-                            
-                            #EXTRATO 03/10/2023 < 01/10/2023
-                            if emissao_menos_mes < entrada_aluno_date: 
-                                dias_pro_rata = (data_emissao - entrada_aluno).days
-                                valor_pro_rata = dias_pro_rata * valor_por_dia     
-                                contador_titulares_prorata += 1                                                                                                               
-                            else:
-                                print("A data de emissão não está dentro do período pró-rata.")
-                            
-                            valor_total = valor_pro_rata + float(titular_studentAgreement_value)
+                print(f"Competência: {data_emissao_date}")
+                
+                #EXTRATO 03/10/2023 < 01/10/2023
+                if emissao_menos_mes < entrada_aluno_date: 
+                    dias_pro_rata_negativo = (data_emissao_date - entrada_aluno_date).days
+                    dias_pro_rata = dias_pro_rata_negativo * -1
 
-                            valor_referencia = titular_studentAgreement_value * contador_titulares_prorata
+                    print(f"Dias pro rata: {dias_pro_rata}")
+                    valor_pro_rata = dias_pro_rata * valor_por_dia     
+                    contador_titulares_prorata += 1                                                                                                               
+                else:
+                    print("A data de emissão não está dentro do período pró-rata.")
+                
+                valor_total = valor_pro_rata + float(titular_studentAgreement_value)
 
-                            soma_valores_prorata += valor_pro_rata
-                            soma_mensalidade_titular += float(titular_studentAgreement_value)
+                valor_referencia = titular_studentAgreement_value * contador_titulares_prorata
 
-                            total_coluna = soma_valores_prorata + soma_mensalidade_titular
+                soma_valores_prorata += valor_pro_rata
+                soma_mensalidade_titular += float(titular_studentAgreement_value)
 
-                            # Dados Extrato
-                            cabecalhos = ["Nome do Aluno", "Parentesco", "CPF", "Pró rata", "Valor", "Valor Total"] # Cabeçalhos das colunas
-                            dados = [["Teste", "TITULAR", 123, valor_pro_rata, titular_studentAgreement_value, valor_total],] # Dados
-                            print(tabulate(dados, headers=cabecalhos, tablefmt="grid")) # Imprime a tabela
+                total_coluna = soma_valores_prorata + soma_mensalidade_titular
 
-                            # Dados Referência
-                            cabecalhos = ["Referência", "Quantidade", "Valor"] # Cabeçalhos das colunas
-                            dados = [["Pró rata - Titulares", contador_titulares_prorata, valor_pro_rata],
-                                        ["TItulares", contagem_titulares_empresa, soma_mensalidade_titular],
-                                        ["Total", contagem_titulares_empresa,total_coluna]
-                                        ] # Dados
+                # Dados Extrato
+                cabecalhos = ["Nome do Aluno", "Parentesco", "CPF", "Pró rata", "Valor", "Valor Total"] # Cabeçalhos das colunas
+                
+                dados = [["Teste", "TITULAR", 123, valor_pro_rata, titular_studentAgreement_value, valor_total],] # Dados
+                print(tabulate(dados, headers=cabecalhos, tablefmt="grid")) # Imprime a tabela
 
-                            print(tabulate(dados, headers=cabecalhos, tablefmt="grid")) # Imprime a tabela
+                # Dados Referência
+                cabecalhos = ["Referência", "Quantidade", "Valor"] # Cabeçalhos das colunas
+                dados = [["Pró rata - Titulares", contador_titulares_prorata, valor_pro_rata],
+                            ["TItulares", contagem_titulares_empresa, soma_mensalidade_titular],
+                            ["Total", contagem_titulares_empresa,total_coluna]
+                            ] # Dados
 
-                        relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
+                print(tabulate(dados, headers=cabecalhos, tablefmt="grid")) # Imprime a tabela
+
+                relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
 
 
             else:
                 print(f"A empresa {empresa_tradeName}, não tem a data corte igual ao dia de hoje")
 
                 # Data de vencimento da cobrança
-                calcular_data_vencimento # Data de vencimento (data corte + 10)
+            calcular_data_vencimento # Data de vencimento (data corte + 10)
         else:
             print(f"A empresa {empresa_tradeName}, não está ativa")
     print("")
