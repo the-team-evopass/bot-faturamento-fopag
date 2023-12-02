@@ -47,7 +47,7 @@ if respostaAllCompany.status_code == 200:
         titular_company = titular['company']
         for companhia_titular in titular_company:
             nome_empresa_titular = titular_company['tradeName']
-            
+
         # Loop para coletar dados dos Dependentes dos titulares
         for dependente in titular_dependents:
             dependente_firstName = dependente['firstName']
@@ -61,3 +61,6 @@ if respostaAllCompany.status_code == 200:
 
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
+
+
+teste = 0
