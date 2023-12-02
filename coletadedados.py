@@ -47,6 +47,7 @@ if respostaAllCompany.status_code == 200:
         titular_company = titular['company']
         for companhia_titular in titular_company:
             nome_empresa_titular = titular_company['tradeName']
+            
         # Loop para coletar dados dos Dependentes dos titulares
         for dependente in titular_dependents:
             dependente_firstName = dependente['firstName']
@@ -54,7 +55,8 @@ if respostaAllCompany.status_code == 200:
             dependente_startValidity = dependente['startValidity']
             dependente_cpf = dependente['cpf']
             contagem_dependentes_empresa += 1 
-            print(f"O dependente: {dependente_firstName} pertence ao titular {titular_firstName}")       
+            print(f"O dependente: {dependente_firstName} pertence ao titular {titular_firstName}")    
+
         print(f"O titular {titular_firstName} pertence a empresa {nome_empresa_titular}")
 
 else:
