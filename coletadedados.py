@@ -64,4 +64,4 @@ else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
 
 
-teste = 1
+teste = 0
