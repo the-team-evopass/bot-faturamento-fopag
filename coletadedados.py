@@ -22,6 +22,7 @@ if respostaAllCompany.status_code == 200:
 
     # Contador de empresas
     contagem_empresas_implantacao = 0
+    
     # Contador de titulares e dependentes
     contagem_titulares_empresa = 0
     contagem_dependentes_empresa = 0
