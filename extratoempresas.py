@@ -61,6 +61,11 @@ if respostaAllCompany.status_code == 200:
                 contador_titulares_prorata = 0
                 contador_titulares = 0
 
+                soma_valores_prorata = 0
+                soma_mensalidade_titular = 0
+                soma_valor_total = 0
+                soma_mensalidade_total = 0
+
                 #Tratamento de dados das datas de emissão de boleto e data start do aluno 
                 data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate) #Data Emissão do Boleto | 2023-10-30
                 
@@ -93,13 +98,6 @@ if respostaAllCompany.status_code == 200:
                     titular_studentAgreement_type = titular['studentAgreement'][0]['type']
                     titular_companyCNPJ = titular['company']['cnpj']
                     titular_status = titular['status']
-
-                    
-
-                    soma_valores_prorata = 0
-                    soma_mensalidade_titular = 0
-                    soma_valor_total = 0
-                    soma_mensalidade_total = 0
                     
                     entrada_aluno = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
                     entrada_aluno_date = entrada_aluno.date() #Entrada de aluno em Data 01/10/2023
@@ -160,12 +158,12 @@ if respostaAllCompany.status_code == 200:
                                 valor_pro_rata = 0
                                 contador_titulares += 1
                                 soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
-                                soma_valor_total += valor_total
 
                                 soma_total = float(soma_mensalidade_total) + float(soma_valor_total)
+                                soma_valor_total += valor_total
                                 # Adiciona os dados do titular à lista
                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
-                
+
                 soma_total = float(soma_mensalidade_total) + float(soma_valor_total)
                 dados_relatorio.append(["Mensalidade -  Titulares", contador_titulares, soma_mensalidade_total])
                 dados_relatorio.append(["TOTAL", "", soma_total])

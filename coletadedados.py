@@ -61,6 +61,3 @@ if respostaAllCompany.status_code == 200:
 
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
-
-
-teste = 0
