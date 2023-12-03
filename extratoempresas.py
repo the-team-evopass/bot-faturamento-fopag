@@ -174,7 +174,6 @@ if respostaAllCompany.status_code == 200:
 
                 relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
 
-
             else:
                 print(f"A empresa {empresa_tradeName}, não tem a data corte igual ao dia de hoje")
 
