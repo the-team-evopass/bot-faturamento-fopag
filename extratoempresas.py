@@ -82,6 +82,11 @@ if respostaAllCompany.status_code == 200:
                 dados_extrato = []
                 dados_relatorio = []
 
+                soma_valores_prorata = 0
+                soma_mensalidade_titular = 0
+                soma_valor_total = 0
+                soma_mensalidade_total = 0
+
                 #Filtro para verificar a quantidade de titulares ativos na empresa
                 for titular in listaTitulares:
                     titular_id = titular['id']
@@ -93,13 +98,6 @@ if respostaAllCompany.status_code == 200:
                     titular_studentAgreement_type = titular['studentAgreement'][0]['type']
                     titular_companyCNPJ = titular['company']['cnpj']
                     titular_status = titular['status']
-
-                    
-
-                    soma_valores_prorata = 0
-                    soma_mensalidade_titular = 0
-                    soma_valor_total = 0
-                    soma_mensalidade_total = 0
                     
                     entrada_aluno = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
                     entrada_aluno_date = entrada_aluno.date() #Entrada de aluno em Data 01/10/2023
@@ -166,6 +164,7 @@ if respostaAllCompany.status_code == 200:
                                 # Adiciona os dados do titular à lista
                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
                 
+                print(soma_mensalidade_titular, soma_valor_total)
                 soma_total = float(soma_mensalidade_total) + float(soma_valor_total)
                 dados_relatorio.append(["Mensalidade -  Titulares", contador_titulares, soma_mensalidade_total])
                 dados_relatorio.append(["TOTAL", "", soma_total])
@@ -175,7 +174,6 @@ if respostaAllCompany.status_code == 200:
                 print(tabulate(dados_relatorio, headers=cabecalhos_relatorio, tablefmt="grid"))
 
                 relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
-
 
             else:
                 print(f"A empresa {empresa_tradeName}, não tem a data corte igual ao dia de hoje")
