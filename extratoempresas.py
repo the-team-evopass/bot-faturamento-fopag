@@ -60,6 +60,8 @@ if respostaAllCompany.status_code == 200:
 
                 contador_titulares_prorata = 0
                 contador_titulares = 0
+                contador_dependente_prorata = 0
+                contador_dependente = 0
 
                 soma_valores_prorata = 0
                 soma_mensalidade_titular = 0
@@ -87,6 +89,16 @@ if respostaAllCompany.status_code == 200:
                 dados_extrato = []
                 dados_relatorio = []
 
+                soma_valores_prorata = 0
+                soma_mensalidade_titular = 0
+                soma_valor_total = 0
+                soma_mensalidade_total = 0
+
+                soma_valores_prorata_dependente = 0
+                soma_mensalidade_dependente = 0
+                soma_valor_total_dependente = 0
+                soma_mensalidade_total_dependente = 0
+
                 #Filtro para verificar a quantidade de titulares ativos na empresa
                 for titular in listaTitulares:
                     titular_id = titular['id']
@@ -99,10 +111,11 @@ if respostaAllCompany.status_code == 200:
                     titular_companyCNPJ = titular['company']['cnpj']
                     titular_status = titular['status']
                     
-                    entrada_aluno = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
-                    entrada_aluno_date = entrada_aluno.date() #Entrada de aluno em Data 01/10/2023
+                    entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
+                    entrada_titular_date = entrada_titular.date() #Entrada de aluno em Data 01/10/2023
 
                     valor_pro_rata = 0.0 #Contador float
+
 
                     # Dados Extrato
                     cabecalhos_extrato = ["Nome do Aluno", "Parentesco", "CPF", "Pró rata", "Valor", "Valor Total"] # Cabeçalhos das colunas
@@ -111,23 +124,126 @@ if respostaAllCompany.status_code == 200:
                     # Comparar CNPJ da empresa atual com o da empresa do titular atual
                     if titular_companyCNPJ == empresa_cnpj:
                         if titular_status == True and titular_studentAgreement_type == "F":
-                            contagem_titulares_empresa += 1
+                            contagem_titulares_empresa += 1 
 
                             total_dependentes_titular = 0
 
-                            for dependente in titular['dependents']:
-                                dependente_status = dependente['status']
-                                dependente_firstName = dependente['firstName']
-                                dependente_cpf = dependente['cpf']
+                            executado = False
 
-                                if dependente_status == True:
-                                    total_dependentes_titular += 1 
-                            
-                            print(f"O {titular_firstName} tem {total_dependentes_titular} dependentes")
-                            
-                            #EXTRATO 03/10/2023 < 01/10/2023
-                            if emissao_menos_mes < entrada_aluno_date: 
-                                dias_pro_rata_negativo = (data_emissao_date - entrada_aluno_date).days
+                            for dependente_Agreement in listaDependentes:
+                                dependente_Agreement_all = dependente_Agreement['dependentAgreement']
+                            for dependente_value in dependente_Agreement_all:
+                                dependente_agreement_value = dependente_value['value']
+                                for dependente in titular['dependents']:
+                                    dependente_status = dependente['status']
+                                    dependente_firstName = dependente['firstName']
+                                    dependente_cpf = dependente['cpf']
+                                    dependente_startValidity = dependente['startValidity']
+
+                                    if dependente_status == True:
+                                        total_dependentes_titular += 1  
+                                        
+                                        entrada_dependente = datetime.strptime(dependente_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
+                                        entrada_dependente_date = entrada_dependente.date() #Entrada de aluno em Data 01/10/2023
+                                        valor_pro_rata_dependente = 0.0 #Contador float
+
+                                        #EXTRATO 03/10/2023 < 01/10/2023
+                                        if emissao_menos_mes < entrada_titular_date:
+
+                                            if executado == False:
+                                                #Calculo extrato titulares
+                                                dias_pro_rata_negativo = (data_emissao_date - entrada_titular_date).days
+                                                dias_pro_rata = dias_pro_rata_negativo # X -1
+
+                                                print(f"O {titular_firstName} tem {dias_pro_rata} dias pro rata")
+                                                valor_pro_rata = dias_pro_rata * valor_por_dia     
+                                                contador_titulares_prorata += 1
+                                                contador_titulares += 1
+                                            
+                                                valor_total = valor_pro_rata + float(titular_studentAgreement_value)
+
+                                                valor_referencia = titular_studentAgreement_value * contador_titulares_prorata
+
+                                                soma_valores_prorata += valor_pro_rata
+                                                soma_mensalidade_titular += float(titular_studentAgreement_value)
+
+                                                soma_valor_total += valor_total
+
+                                                soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
+
+                                                # Adiciona os dados do titular à lista
+                                                dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
+                                                dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, soma_valor_total])
+
+                                                executado = True
+
+                                            #Calculo extrato dependentes
+                                            dias_pro_rata_negativo_dependente = (data_emissao_date - entrada_dependente_date).days
+                                            dias_pro_rata_dependente = dias_pro_rata_negativo_dependente # X -1
+
+                                            print(f"O Dependente: {dependente_firstName} tem {dias_pro_rata_dependente} dias pro rata")
+                                            valor_pro_rata_dependente = dias_pro_rata_dependente * valor_por_dia     
+                                            contador_dependente_prorata += 1
+                                            contador_dependente += 1
+                                        
+                                            valor_total_dependente = valor_pro_rata_dependente + float(dependente_agreement_value)
+
+                                            valor_referencia_dependente = dependente_agreement_value * contador_dependente_prorata
+
+                                            soma_valores_prorata_dependente += valor_pro_rata_dependente
+                                            soma_mensalidade_dependente += float(dependente_agreement_value)
+
+                                            total_coluna = soma_valores_prorata + soma_valores_prorata_dependente + soma_mensalidade_titular + soma_mensalidade_dependente
+
+                                            soma_valor_total_dependente += valor_total_dependente
+
+                                            soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
+                                            # Adiciona os dados do dependente à lista
+                                            dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, valor_pro_rata_dependente, dependente_agreement_value, valor_total_dependente])
+                                            dados_relatorio.append(["Pró rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])
+                                        else:
+                                            if executado == False:
+                                                print(f"O {titular_firstName} não tem pró rata.")
+                                                valor_total = 0
+                                                valor_pro_rata = 0
+                                                contador_titulares += 1
+                                                soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
+                                                soma_valor_total += valor_total
+
+                                                soma_total = float(soma_mensalidade_total) + float(soma_valor_total)
+                                                # Adiciona os dados do titular à lista
+                                                dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
+
+                                                executado = True 
+                                            
+                                            
+                                            valor_total_dependente = 0
+                                            valor_pro_rata_dependente = 0
+                                            contador_dependente += 1
+                                            soma_mensalidade_total_dependente = contador_dependente * float(dependente_agreement_value)
+                                            soma_valor_total_dependente += valor_total_dependente
+
+                                            soma_valor_total_dependente = float(soma_mensalidade_total_dependente) + float(soma_valor_total_dependente)
+                                            # Adiciona os dados do titular à lista
+                                            dados_extrato.append([dependente_firstName, "DEPENDENTES", titular_cpf, valor_pro_rata_dependente, dependente_agreement_value, valor_total_dependente])
+                                            
+                                                
+                        
+
+                        total_dependentes_titular = 0
+
+                        soma_valores_prorata = 0
+                        soma_mensalidade_titular = 0
+                        soma_valor_total = 0
+
+                        soma_valores_prorata_dependente = 0
+                        soma_mensalidade_dependente = 0
+                        soma_valor_total_dependente = 0
+
+                        if emissao_menos_mes < entrada_titular_date:
+                            if executado == False:
+                                #Calculo extrato titulares
+                                dias_pro_rata_negativo = (data_emissao_date - entrada_titular_date).days
                                 dias_pro_rata = dias_pro_rata_negativo # X -1
 
                                 print(f"O {titular_firstName} tem {dias_pro_rata} dias pro rata")
@@ -142,8 +258,6 @@ if respostaAllCompany.status_code == 200:
                                 soma_valores_prorata += valor_pro_rata
                                 soma_mensalidade_titular += float(titular_studentAgreement_value)
 
-                                total_coluna = soma_valores_prorata + soma_mensalidade_titular
-
                                 soma_valor_total += valor_total
 
                                 soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
@@ -152,7 +266,9 @@ if respostaAllCompany.status_code == 200:
                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
                                 dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, soma_valor_total])
 
-                            else:
+                                executado = True
+                        else:
+                            if executado == False:
                                 print(f"O {titular_firstName} não tem pró rata.")
                                 valor_total = 0
                                 valor_pro_rata = 0
@@ -164,8 +280,14 @@ if respostaAllCompany.status_code == 200:
                                 # Adiciona os dados do titular à lista
                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
 
-                soma_total = float(soma_mensalidade_total) + float(soma_valor_total)
+                                executado = True
+                                
+                            
+                dados_relatorio.append(["Pró rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])                
+                soma_total = float(soma_mensalidade_total) + float(soma_valor_total) + float(soma_mensalidade_total_dependente) + float(soma_valor_total_dependente)
+
                 dados_relatorio.append(["Mensalidade -  Titulares", contador_titulares, soma_mensalidade_total])
+                dados_relatorio.append(["Mensalidade -  Dependentes", contador_dependente, soma_mensalidade_total_dependente])
                 dados_relatorio.append(["TOTAL", "", soma_total])
 
                 # Imprime a tabela
@@ -184,4 +306,6 @@ if respostaAllCompany.status_code == 200:
     print("")
 
 else:
+
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
+    # nasca
