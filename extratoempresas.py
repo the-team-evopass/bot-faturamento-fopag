@@ -2,6 +2,7 @@ import requests
 from datetime import datetime, timedelta
 from tabulate import tabulate
 from datavencimento import calcular_data_vencimento
+import json
 
 # URLs DAS APIs
 urlAllCompany = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements'
@@ -304,6 +305,22 @@ if respostaAllCompany.status_code == 200:
         else:
             print(f"A empresa {empresa_tradeName}, não está ativa")
     print("")
+
+    # Use tabulate para exibir a tabela
+    print(tabulate(dados_extrato, headers=cabecalhos_extrato, tablefmt="grid"))
+    print(tabulate(dados_relatorio, headers=cabecalhos_relatorio, tablefmt="grid"))
+
+    # Converter os dados para estruturas compatíveis com JSON
+    dados_json_extrato = {'dados_extrato': [dict(zip(cabecalhos_extrato, linha)) for linha in dados_extrato]}
+    dados_json_relatorio = {'dados_relatorio': [dict(zip(cabecalhos_relatorio, linha)) for linha in dados_relatorio]}
+
+    # Converter para JSON
+    json_extrato = json.dumps(dados_json_extrato, indent=2)
+    json_relatorio = json.dumps(dados_json_relatorio, indent=2)
+
+    # Exibir o JSON
+    print(json_extrato)
+    print(json_relatorio)
 
 else:
 
