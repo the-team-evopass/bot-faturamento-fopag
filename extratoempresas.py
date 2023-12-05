@@ -63,6 +63,11 @@ if respostaAllCompany.status_code == 200:
                 contador_dependente_prorata = 0
                 contador_dependente = 0
 
+                soma_valores_prorata = 0
+                soma_mensalidade_titular = 0
+                soma_valor_total = 0
+                soma_mensalidade_total = 0
+
                 #Tratamento de dados das datas de emissão de boleto e data start do aluno 
                 data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate) #Data Emissão do Boleto | 2023-10-30
                 
@@ -269,9 +274,9 @@ if respostaAllCompany.status_code == 200:
                                 valor_pro_rata = 0
                                 contador_titulares += 1
                                 soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
-                                soma_valor_total += valor_total
 
                                 soma_total = float(soma_mensalidade_total) + float(soma_valor_total)
+                                soma_valor_total += valor_total
                                 # Adiciona os dados do titular à lista
                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
 
@@ -280,6 +285,7 @@ if respostaAllCompany.status_code == 200:
                             
                 dados_relatorio.append(["Pró rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])                
                 soma_total = float(soma_mensalidade_total) + float(soma_valor_total) + float(soma_mensalidade_total_dependente) + float(soma_valor_total_dependente)
+
                 dados_relatorio.append(["Mensalidade -  Titulares", contador_titulares, soma_mensalidade_total])
                 dados_relatorio.append(["Mensalidade -  Dependentes", contador_dependente, soma_mensalidade_total_dependente])
                 dados_relatorio.append(["TOTAL", "", soma_total])
@@ -300,5 +306,6 @@ if respostaAllCompany.status_code == 200:
     print("")
 
 else:
+
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
     # nasca
