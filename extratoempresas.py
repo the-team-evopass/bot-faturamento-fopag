@@ -174,7 +174,7 @@ if respostaAllCompany.status_code == 200:
 
                                                 # Adiciona os dados do titular à lista
                                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
-                                                dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, soma_valor_total])
+                                                dados_relatorio.append(["Pro rata - Titulares", contador_titulares_prorata, soma_valor_total])
 
                                                 executado = True
 
@@ -201,7 +201,7 @@ if respostaAllCompany.status_code == 200:
                                             soma_mensalidade_total = contador_titulares * float(titular_studentAgreement_value)
                                             # Adiciona os dados do dependente à lista
                                             dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, valor_pro_rata_dependente, dependente_agreement_value, valor_total_dependente])
-                                            dados_relatorio.append(["Pró rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])
+                                            dados_relatorio.append(["Pro rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])
                                         else:
                                             if executado == False:
                                                 print(f"O {titular_firstName} não tem pró rata.")
@@ -265,12 +265,12 @@ if respostaAllCompany.status_code == 200:
 
                                 # Adiciona os dados do titular à lista
                                 dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_pro_rata, titular_studentAgreement_value, valor_total])
-                                dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, soma_valor_total])
+                                dados_relatorio.append(["Pro rata - Titulares", contador_titulares_prorata, soma_valor_total])
 
                                 executado = True
                         else:
                             if executado == False:
-                                print(f"O {titular_firstName} não tem pró rata.")
+                                print(f"O {titular_firstName} não tem pro rata.")
                                 valor_total = 0
                                 valor_pro_rata = 0
                                 contador_titulares += 1
@@ -284,7 +284,7 @@ if respostaAllCompany.status_code == 200:
                                 executado = True
                                 
                             
-                dados_relatorio.append(["Pró rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])                
+                dados_relatorio.append(["Pro rata - Dependentes", contador_dependente_prorata, soma_valor_total_dependente])                
                 soma_total = float(soma_mensalidade_total) + float(soma_valor_total) + float(soma_mensalidade_total_dependente) + float(soma_valor_total_dependente)
 
                 dados_relatorio.append(["Mensalidade -  Titulares", contador_titulares, soma_mensalidade_total])
