@@ -59,7 +59,5 @@ if respostaAllCompany.status_code == 200:
             contagem_dependentes_empresa += 1 
             print(f"O dependente: {dependente_firstName} pertence ao titular {titular_firstName}")    
 
-        
-
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
