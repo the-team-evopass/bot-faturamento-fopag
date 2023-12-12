@@ -73,14 +73,9 @@ if respostaAllCompany.status_code == 200:
                         else:
                             print(f"O dependente {dependente_firstName}, não está ATIVO")
 
-                    print(f"A empresa {empresa_tradeName} pagará {empresa_value} por valor de vida, {contagem_value_titular} por titular e {contagem_value_dependente} por dependente.")
-                    valor_total_empresa = float(empresa_value) + float(contagem_value_titular) + float(contagem_value_dependente)
-                    print(valor_total_empresa)
-
-                    
-
-                else:
-                    print(f"O titular {titular_firstName}, não está ATIVO")
+            print(f"A empresa {empresa_tradeName} pagará {empresa_value} por valor de vida, ela tem {contagem_titulares_empresa} e pagará {contagem_value_titular} por titular e {contagem_value_dependente} por dependente.")
+            valor_total_empresa = float(empresa_value) + float(contagem_value_titular) + float(contagem_value_dependente)
+            print(valor_total_empresa)
 
             print(contagem_empresas)
 
