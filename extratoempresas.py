@@ -12,8 +12,15 @@ urlAllDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/de
 urlAgreementDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent_agreement'
 
 #Obter a data atual
-dia_emissao_teste = 2 #teste com 18
+dia_emissao_teste = 12 #teste com 18
 data_atual = datetime.now()
+
+# Dados Extrato
+cabecalhos_extrato = ["Nome do Aluno", "Parentesco", "CPF", "Pró rata", "Valor", "Valor Total"] # Cabeçalhos das colunas
+cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das colunas
+
+dados_extrato = []
+dados_relatorio = []
 
 print(f"Testando como se o dia atual fosse {dia_emissao_teste} ...")
 print("")
@@ -87,8 +94,7 @@ if respostaAllCompany.status_code == 200:
                 print(f"Competência: {competencia_mes_ano}")
                 #print(f"Data de vencimento: {data_vencimento}")
 
-                dados_extrato = []
-                dados_relatorio = []
+                
 
                 soma_valores_prorata = 0
                 soma_mensalidade_titular = 0
@@ -118,9 +124,7 @@ if respostaAllCompany.status_code == 200:
                     valor_pro_rata = 0.0 #Contador float
 
 
-                    # Dados Extrato
-                    cabecalhos_extrato = ["Nome do Aluno", "Parentesco", "CPF", "Pró rata", "Valor", "Valor Total"] # Cabeçalhos das colunas
-                    cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das colunas
+                    
 
                     # Comparar CNPJ da empresa atual com o da empresa do titular atual
                     if titular_companyCNPJ == empresa_cnpj:
