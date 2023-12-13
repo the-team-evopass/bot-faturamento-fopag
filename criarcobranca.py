@@ -1,5 +1,4 @@
 import requests
-from datavencimento import calcular_data_vencimento
 
 def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_total_empresa, headers, data_vencimento):
     try:
@@ -10,13 +9,11 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
             return
 
         print("Lista de clientes obtida com sucesso:")
-        response_data = response.json()
-        response_teste = response_data.get('data', [])
+        response_jon = response.json()
+        response_data = response_jon.get('data', [])
 
-        for customer in response_teste:
+        for customer in response_data:
             response_data_cpfCnpj = customer.get('cpfCnpj', '')
-            print(response_data_cpfCnpj)
-            print(f"cnpj empresa: {empresa_cnpj}")
 
             if response_data_cpfCnpj == empresa_cnpj:
                 # Criar uma cobrança para o cliente
@@ -40,4 +37,3 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
 
     except Exception as e:
         print(f"Erro inesperado: {str(e)}")
-
