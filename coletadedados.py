@@ -75,27 +75,25 @@ if respostaAllCompany.status_code == 200:
                 titular_status = titular['status']
                 titular_startValidity = titular['startValidity']
                 titular_cpf = titular['cpf']
-                titular_agreement = titular['studentAgreement']
                 titular_company = titular['company']
                 titular_companyCNPJ = titular['company']['cnpj']
                 titular_studentAgreement_value = titular['studentAgreement'][0]['value']
                 titular_studentAgreement_type = titular['studentAgreement'][0]['type']
                 titular_startValidity = titular['startValidity']
-                print(titular_startValidity)
                 entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
                 entrada_aluno_date = entrada_titular.date() #Entrada de aluno em Data 01/10/2023
                 if titular_status == True and titular_studentAgreement_type == "F":
                     if titular_companyCNPJ == empresa_cnpj:
-                        print(f"valor mensal titular: {titular_studentAgreement_value}")
-                        contagem_value_titular += float(titular_studentAgreement_value)
                         contagem_titulares_empresa += 1
                         if emissao_menos_mes < entrada_aluno_date:
                             valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
-                            print(valor_calculo_prorata)
                             valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
-                            print(f"O titular {titular_firstName} tem o valor pro rata igual a {valor_mensal_titular}")
+                            print(f"O titular {titular_firstName} tem o valor pro rata + mensalidade igual a {valor_mensal_titular}")
                         else:
-                            print(f"O titular {titular_firstName} não é prorata")
+                            valor_mensal_titular = titular_studentAgreement_value
+                            print(f"O titular {titular_firstName} não é prorata, valor mensal = {titular_studentAgreement_value}")
+                        
+                        contagem_value_titular += float(valor_mensal_titular)
 
                         # Loop para coletar dados dos Dependentes dos titulares
                         for dependente in listaDependentes:
@@ -103,25 +101,26 @@ if respostaAllCompany.status_code == 200:
                             dependente_status = dependente['status']
                             dependente_startValidity = dependente['startValidity']
                             dependente_cpf = dependente['cpf']
-                            dependente_agreement = dependente['dependentAgreement']
-                            dependente_student = dependente['student']['cpf']
-                            dependente_studentAgreement_value = dependente['studentAgreement'][0]['value']
-                            dependente_studentAgreement_type = dependente['studentAgreement'][0]['type']
+                            dependente_student_cpf = dependente['student']['cpf']
+                            dependente_studentAgreement_value = dependente['dependentAgreement'][0]['value']
+                            dependente_studentAgreement_type = dependente['dependentAgreement'][0]['type']
                             dependente_startValidity = dependente['startValidity']
                             entrada_dependente = datetime.strptime(dependente_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
                             entrada_aluno_date = entrada_dependente.date() #Entrada de aluno em Data 01/10/2023
                             if dependente_status == True and dependente_studentAgreement_type == "F":
                                 contagem_dependentes_empresa += 1
-                                if dependente_student == titular_cpf:
+                                if dependente_student_cpf == titular_cpf:
                                     contagem_value_dependente += 1
                                     contagem_value_dependente += float(dependente_studentAgreement_value)
                                     if emissao_menos_mes < entrada_aluno_date:
                                         valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
-                                        valor_mensal_dependente = dependente_studentAgreement_value + valor_calculo_prorata
-                                        print(f"O {dependente_firstName} tem o valor pro rata igual a {valor_calculo_prorata}")
-
+                                        valor_mensal_dependente = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
+                                        print(f"O dependente {dependente_firstName} tem o valor pro rata + mensalidade igual a {valor_mensal_dependente}")
                                     else:
-                                        print(f"O {dependente_firstName} não é prorata")
+                                        valor_mensal_dependente = dependente_studentAgreement_value
+                                        print(f"O dependente {dependente_firstName} não é prorata, valor mensal = {valor_mensal_dependente}")
+                                    
+                                    contagem_value_dependente += float(valor_mensal_dependente)
                             else:
                                 print(f"O dependente {dependente_firstName}, não está ATIVO")
 
@@ -129,6 +128,62 @@ if respostaAllCompany.status_code == 200:
         valor_total_empresa = float(empresa_value) + float(contagem_value_titular) + float(contagem_value_dependente)
         print(f"valor total da empresa: {valor_total_empresa}")
         print('                                                           ')
+
+        #CRIAR COBRANÇA
+        from datavencimento import calcular_data_vencimento
+
+        #Api do asaas
+        api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoX2QyMGQ0MGYwLWYwZTEtNDI5NS1iYmRlLTIyNzFjMTZlNjZhNw=='
+
+        #URLs do asaas
+        urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers'
+        urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
+
+        #Cabeçalho
+        headers = {
+            'Content-Type': 'application/json',
+            'access_token': api_key
+        }
+
+        #Listar clientes
+        response = requests.get(urlListarClientes, headers=headers)
+
+        if response.status_code == 200:
+            print("Lista de clientes obtida com sucesso:")
+            response_data = response.json()
+            response_teste = response_data['data']
+            print(response_teste)
+            for resposta in response_teste:
+                response_data_cpfCnpj = resposta['cpfCnpj']
+                print(response_data_cpfCnpj)
+                print(f"cnpj empresa: {empresa_cnpj}")
+
+            if response_data_cpfCnpj == empresa_cnpj:
+                #Identificar os clientes de cada 'data' e criar uma cobrança para cada cliente
+                for customer in response_data['data']:
+                    customer_id = customer['id']
+                    customer_name = customer['name']
+                    invoice_data = {
+                        'customer': customer_id,  # ID do cliente
+                        'billingType': 'BOLETO',  #BOLETO = FOPAG
+                        'value': valor_total_empresa,  # Valor da cobrança            (Substituir pelo valor no banco de dados)
+                        'dueDate': calcular_data_vencimento(),  # Data de vencimento  (Substituir pelo valor no banco de dados)
+                        'description': 'Cobrança para cliente',
+                    }
+
+                    #Criar a cobrança para os clientes
+                    invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
+
+                    if invoice_response.status_code == 200:
+                        print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
+                    else:
+                        print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}")
+        else:
+            print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
+            print(f"Resposta: {response.text}")
+
+
+
     print(contagem_empresas)
 
 else:
