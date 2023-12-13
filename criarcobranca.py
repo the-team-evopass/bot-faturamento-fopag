@@ -1,47 +1,43 @@
-# CRIANDO COBRANÇA PARA TODOS OS CLIENTES DO ASAAS
 import requests
-from coletadedados import relacao_ativos
 from datavencimento import calcular_data_vencimento
 
-#Api do asaas
-api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoX2QyMGQ0MGYwLWYwZTEtNDI5NS1iYmRlLTIyNzFjMTZlNjZhNw=='
+def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_total_empresa, headers, data_vencimento):
+    try:
+        # Obter a lista de clientes
+        response = requests.get(urlListarClientes, headers=headers)
+        if response.status_code != 200:
+            print(f"Erro ao obter a lista de clientes. Código de status: {response.status_code}")
+            return
 
-#URLs do asaas
-urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers'
-urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
+        print("Lista de clientes obtida com sucesso:")
+        response_data = response.json()
+        response_teste = response_data.get('data', [])
 
-#Cabeçalho
-headers = {
-    'Content-Type': 'application/json',
-    'access_token': api_key
-}
+        for customer in response_teste:
+            response_data_cpfCnpj = customer.get('cpfCnpj', '')
+            print(response_data_cpfCnpj)
+            print(f"cnpj empresa: {empresa_cnpj}")
 
-#Listar clientes
-response = requests.get(urlListarClientes, headers=headers)
+            if response_data_cpfCnpj == empresa_cnpj:
+                # Criar uma cobrança para o cliente
+                customer_id = customer.get('id', '')
+                customer_name = customer.get('name', '')
+                invoice_data = {
+                    'customer': customer_id,
+                    'billingType': 'BOLETO',
+                    'value': valor_total_empresa,
+                    'dueDate': data_vencimento,
+                    'description': 'Cobrança para cliente',
+                }
 
-if response.status_code == 200:
-    print("Lista de clientes obtida com sucesso:")
-    response_data = response.json()
+                # Criar a cobrança para o cliente
+                invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
 
-    #Identificar os clientes de cada 'data' e criar uma cobrança para cada cliente
-    for customer in response_data['data']:
-        customer_id = customer['id']
-        customer_name = customer['name']
-        invoice_data = {
-            'customer': customer_id,  # ID do cliente
-            'billingType': 'BOLETO',  #BOLETO = FOPAG
-            'value': relacao_ativos,  # Valor da cobrança            (Substituir pelo valor no banco de dados)
-            'dueDate': calcular_data_vencimento(),  # Data de vencimento  (Substituir pelo valor no banco de dados)
-            'description': 'Cobrança para cliente',
-        }
+                if invoice_response.status_code == 200:
+                    print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
+                else:
+                    print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}")
 
-        #Criar a cobrança para os clientes
-        invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
 
-        if invoice_response.status_code == 200:
-            print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
-        else:
-            print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}")
-else:
-    print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
-    print(f"Resposta: {response.text}")
