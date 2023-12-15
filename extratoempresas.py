@@ -56,8 +56,8 @@ if respostaAllCompany.status_code == 200:
             empresa_value = valor['value']
 
         # Contador de titulares e dependentes
-        contagem_titulares_empresa = 0
-        contagem_dependentes_empresa = 0
+        contador_titulares_empresa = 0
+        contador_dependentes_empresa = 0
 
         # Lógica para filtrar apenas as empresas ativas
         if empresa_companyStatus == "EM IMPLANTACAO":
@@ -116,7 +116,7 @@ if respostaAllCompany.status_code == 200:
                     # Comparar CNPJ da empresa atual com o da empresa do titular atual
                     if titular_companyCNPJ == empresa_cnpj:
                         if titular_status == True and titular_studentAgreement_type == "F":
-                            contagem_titulares_empresa += 1 
+                            contador_titulares_empresa += 1 
 
                             total_dependentes_titular = 0
 
@@ -214,7 +214,7 @@ if respostaAllCompany.status_code == 200:
                                         valor_total_dependente = 0
                                         valor_pro_rata_dependente = 0
                                         contador_dependente += 1
-                                        soma_mensalidade_total_dependente = contador_dependente * float(dependente_agreement_value)
+                                        soma_mensalidade_total_dependente = float(contador_dependente) * float(dependente_agreement_value)
                                         soma_valor_total_dependente += valor_total_dependente
 
                                         soma_valor_total_dependente = float(soma_mensalidade_total_dependente) + float(soma_valor_total_dependente)
@@ -285,7 +285,7 @@ if respostaAllCompany.status_code == 200:
                 print(tabulate(dados_extrato, headers=cabecalhos_extrato, tablefmt="grid"))
                 print(tabulate(dados_relatorio, headers=cabecalhos_relatorio, tablefmt="grid"))
 
-                relacao_ativos = (contagem_titulares_empresa + contagem_dependentes_empresa) * empresa_companyAgreements_value
+                relacao_ativos = (contador_titulares_empresa + contador_dependentes_empresa) * empresa_companyAgreements_value
 
             else:
                 print(f"A empresa {empresa_tradeName}, não tem a data corte igual ao dia de hoje")
