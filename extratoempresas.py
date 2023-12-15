@@ -7,12 +7,14 @@ import json
 # URLs DAS APIs
 urlAllCompany = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements'
 urlAllStudent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress%2Ccompany'
-urlAgreementStudent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/student_agreement'
-urlAllDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent?expand=dependentAgreement'
-urlAgreementDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent_agreement'
+urlAllDependent = 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/dependent?expand=student%2CdependentContact%2CdependentAgreement%2CdependentAddress'
 
-#Obter a data atual
-dia_emissao_teste = 12 #teste com 18
+# Listagem de Empresas e a data corte
+respostaAllCompany = requests.get(urlAllCompany)
+respostaAllStudents = requests.get(urlAllStudent)
+respostaAllDependent = requests.get(urlAllDependent)
+
+dia_emissao = 12
 data_atual = datetime.now()
 
 # Dados Extrato
@@ -22,7 +24,7 @@ cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das c
 dados_extrato = []
 dados_relatorio = []
 
-print(f"Testando como se o dia atual fosse {dia_emissao_teste} ...")
+print(f"Testando como se o dia atual fosse {dia_emissao} ...")
 print("")
 
 # Listagem de Empresas e a data corte
@@ -63,7 +65,7 @@ if respostaAllCompany.status_code == 200:
             contagem_empresas_implantacao += 1
             
             # Filtro das empresas que tem a data corte igual ao dia atual
-            if dia_emissao_teste == empresa_cutoffDate:
+            if dia_emissao == empresa_cutoffDate:
                 print(f"Relação de ativos da empresa {empresa_tradeName} .")
 
                 contador_titulares_prorata = 0
@@ -96,15 +98,15 @@ if respostaAllCompany.status_code == 200:
 
                 #Filtro para verificar a quantidade de titulares ativos na empresa
                 for titular in listaTitulares:
-                    titular_id = titular['id']
                     titular_firstName = titular['firstName']
-                    titular_cpf = titular['cpf']
-                    titular_startValidity = titular['startValidity']
-                    
-                    # Colocar laço de repetição para verificar se há contrato ativo...
-                    titular_studentAgreement_type = titular['studentAgreement'][0]['type']
-                    titular_companyCNPJ = titular['company']['cnpj']
                     titular_status = titular['status']
+                    titular_startValidity = titular['startValidity']
+                    titular_cpf = titular['cpf']
+                    titular_company = titular['company']
+                    titular_companyCNPJ = titular['company']['cnpj']
+                    titular_studentAgreement_value = titular['studentAgreement'][0]['value']
+                    titular_studentAgreement_type = titular['studentAgreement'][0]['type']
+                    titular_startValidity = titular['startValidity']
                     
                     entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
                     entrada_titular_date = entrada_titular.date() #Entrada de aluno em Data 01/10/2023
