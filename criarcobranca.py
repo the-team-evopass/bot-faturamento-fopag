@@ -14,6 +14,10 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
 
         for customer in response_data:
             response_data_cpfCnpj = customer.get('cpfCnpj', '')
+            print(f"cnpj da empresa do asaas {response_data_cpfCnpj}")
+
+            # if response_data_cpfCnpj == "18313310000121":
+            #     print(f"Empresa Asaas: {response_data_cpfCnpj}")
 
             if response_data_cpfCnpj == empresa_cnpj:
                 # Criar uma cobrança para o cliente
@@ -34,6 +38,8 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
                     print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
                 else:
                     print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}")
+            else:
+                print(f"Erro ao criar cobrança para o cpnj {empresa_cnpj}")
 
     except Exception as e:
         print(f"Erro inesperado: {str(e)}")
