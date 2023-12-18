@@ -84,7 +84,6 @@ if respostaAllCompany.status_code == 200:
 
             competencia_mes_ano = data_emissao_date.strftime('%B de %Y')
 
-            
             contador_dependentes_prorata = 0
             contador_dependentes_empresa = 0
 
