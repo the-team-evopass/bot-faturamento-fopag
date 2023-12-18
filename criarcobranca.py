@@ -7,14 +7,11 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
         if response.status_code != 200:
             print(f"Erro ao obter a lista de clientes. Código de status: {response.status_code}")
             return
-
-        print("Lista de clientes obtida com sucesso:")
         response_jon = response.json()
         response_data = response_jon.get('data', [])
 
         for customer in response_data:
             response_data_cpfCnpj = customer.get('cpfCnpj', '')
-            print(f"cnpj da empresa do asaas {response_data_cpfCnpj}")
 
             # if response_data_cpfCnpj == "18313310000121":
             #     print(f"Empresa Asaas: {response_data_cpfCnpj}")
@@ -38,8 +35,6 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
                     print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
                 else:
                     print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}")
-            else:
-                print(f"Erro ao criar cobrança para o cpnj {empresa_cnpj}")
 
     except Exception as e:
         print(f"Erro inesperado: {str(e)}")
