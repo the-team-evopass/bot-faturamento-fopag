@@ -1,3 +1,4 @@
+import json
 import requests
 from tabulate import tabulate
 from calculoprorata import calcular_prorata
@@ -39,30 +40,29 @@ if respostaAllCompany.status_code == 200:
     contador_empresas = 0
 
     for empresa in listaEmpresas:
-        dados_extrato = []
-        dados_relatorio = []
         empresa_cnpj = empresa['cnpj']  # Cnpj da empresa
         empresa_tradeName = empresa['tradeName']  # Nome da empresa
         empresa_companyStatus = empresa['companyStatus']  # Status da empresa
         empresa_cutoffDate = empresa['cutoffDate']  # Data corte
         empresa_value = empresa['companyAgreements'][-1]['value']  # Valor que a empresa paga se ela tem apenas um contrato
+        dados_extrato = []
+        dados_relatorio = []
 
         if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
             contagem_value_titular = 0
             contagem_value_dependente = 0
 
-            # Contador de titulares e dependentes
+            # Contador de titulares
             contador_titulares_empresa = 0
-            contador_dependentes_empresa = 0
-
             contador_empresas += 1
-
             contador_titulares_prorata = 0
 
             soma_valor_titulares_prorata = 0
             soma_valor_dependentes_prorata = 0
             soma_valor_mensalidade_titulares = 0
             soma_valor_mensalidade_dependentes = 0
+
+            contador_dependentes_empresa_temp = 0
 
             # Filtro das empresas que têm a data de corte igual ao dia atual
             print(f"Relação de ativos da empresa {empresa_tradeName} .")
@@ -84,6 +84,10 @@ if respostaAllCompany.status_code == 200:
 
             competencia_mes_ano = data_emissao_date.strftime('%B de %Y')
 
+            
+            contador_dependentes_prorata = 0
+            contador_dependentes_empresa = 0
+
             # Loop para coletar dados dos Titulares
             for titular in listaTitulares:
                 titular_firstName = titular['firstName']
@@ -96,9 +100,6 @@ if respostaAllCompany.status_code == 200:
                 titular_studentAgreement_type = titular['studentAgreement'][-1]['type']
 
                 valor_por_dia = float(titular_studentAgreement_value) / float(30.0)  # valor cobrado por dia
-                
-                contador_dependentes_prorata = 0
-                contador_dependentes_empresa = 0
                     
                 if titular_status == True and titular_studentAgreement_type == "F":
                     if titular_companyCNPJ == empresa_cnpj:
@@ -147,34 +148,40 @@ if respostaAllCompany.status_code == 200:
                             
                                     if emissao_menos_mes < entrada_aluno_date:
                                         soma_valor_dependentes_prorata += float(dependente_studentAgreement_value)
-
+                                        contador_dependentes_prorata += 1
                                         valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
                                         valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
 
-                                        dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, valor_calculo_prorata, dependente_studentAgreement_value, valor_mensal_dependente])
+                                        dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, float(valor_calculo_prorata), float(dependente_studentAgreement_value), float(valor_mensal_dependente)])
 
                                     else:
                                         valor_mensal_dependente = dependente_studentAgreement_value
                                         
-                                        dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, "-", dependente_studentAgreement_value, valor_mensal_dependente])
+                                        dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, "-", float(dependente_studentAgreement_value), float(valor_mensal_dependente)])
 
                                     contagem_value_dependente += float(valor_mensal_dependente)
 
-            dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, soma_valor_titulares_prorata])
-            dados_relatorio.append(["Mensalidade - Titulares", contador_titulares_empresa, soma_valor_mensalidade_titulares])
+            dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, float(soma_valor_titulares_prorata)])
+            dados_relatorio.append(["Mensalidade - Titulares", contador_titulares_empresa, float(soma_valor_mensalidade_titulares)])
 
-            dados_relatorio.append(["Pró rata - Dependentes", contador_dependentes_prorata, soma_valor_dependentes_prorata])
-            dados_relatorio.append(["Mensalidade - Dependentes", contador_dependentes_empresa, soma_valor_mensalidade_dependentes])
+            dados_relatorio.append(["Pró rata - Dependentes", contador_dependentes_prorata, float(soma_valor_dependentes_prorata)])
+            dados_relatorio.append(["Mensalidade - Dependentes", contador_dependentes_empresa, float(soma_valor_mensalidade_dependentes)])
 
             valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
             valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
-            dados_relatorio.append(["Total", "", valor_soma_total])
+            dados_relatorio.append(["Total", "", float(valor_soma_total)])
 
-            print(f"Competência: {competencia_mes_ano}")
-            print(f"Data de Vencimento: {data_vencimento}")
+            # print(f"Competência: {competencia_mes_ano}")
+            # print(f"Data de Vencimento: {data_vencimento}")
                                     
-            print(tabulate(dados_extrato, headers=cabecalhos_extrato, tablefmt="grid"))
-            print(tabulate(dados_relatorio, headers=cabecalhos_relatorio, tablefmt="grid"))
+            # print(tabulate(dados_extrato, headers=cabecalhos_extrato, tablefmt="grid"))
+            # print(tabulate(dados_relatorio, headers=cabecalhos_relatorio, tablefmt="grid"))
+
+            # json.dumps para converter a lista de dicionários em uma string JSON
+            tabela_json_extrato = json.dumps(dados_extrato)
+            tabela_json_relatorio = json.dumps(dados_relatorio)
+            print(tabela_json_extrato)
+            print(tabela_json_relatorio)
 
             #CRIAR COBRANÇA
             #Api do asaas
@@ -199,14 +206,6 @@ if respostaAllCompany.status_code == 200:
                 print(f"cnpj empresa evopass: {empresa_cnpj}")
             else:
                 print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
-                print(f"Resposta: {response.text}")
-
-        else:
-            print(f"A empresa {empresa_tradeName} tem a data corte igual a {empresa_cutoffDate}")
-
-
-        print("Olá")
-            
-
+                print(f"Resposta: {response.text}")            
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
