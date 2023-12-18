@@ -187,7 +187,7 @@ if respostaAllCompany.status_code == 200:
             api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoX2QyMGQ0MGYwLWYwZTEtNDI5NS1iYmRlLTIyNzFjMTZlNjZhNw=='
 
             #URLs do asaas
-            urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers'
+            urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers?limit=100'
             urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
 
             #Cabeçalho
