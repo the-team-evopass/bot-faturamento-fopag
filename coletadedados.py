@@ -23,7 +23,7 @@ cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das c
 dados_extrato = []
 dados_relatorio = []
 
-dia_emissao = 25
+dia_emissao = 20
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -204,6 +204,6 @@ if respostaAllCompany.status_code == 200:
                 criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
             else:
                 print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
-                print(f"Resposta: {response.text}")            
+                print(f"Resposta: {response.text}")    
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")

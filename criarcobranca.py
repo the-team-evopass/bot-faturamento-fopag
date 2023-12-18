@@ -1,4 +1,3 @@
-import json
 import requests
 
 def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_total_empresa, headers, data_vencimento):
@@ -28,11 +27,12 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
                     'billingType': 'BOLETO',
                     'value': valor_total_empresa,
                     'dueDate': data_vencimento,
-                    'description': 'Cobrança para cliente',
+                    'description': 'Cobrança para cliente'
                 }
 
                 # Criar a cobrança para o cliente
                 invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
+
                 if invoice_response.status_code == 200:
                     print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
                 else:
