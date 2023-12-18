@@ -11,15 +11,7 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
         response_json = response.json()
         response_data = response_json.get('data', [])
 
-        esta_presente = any(empresa_cnpj == cliente.get("cpfCnpj") for cliente in response_json.get("data", []))
-
-        if esta_presente:
-            print(f'O cpfCnpj "{empresa_cnpj}" está presente no JSON.')
-        else:
-            print(f'O cpfCnpj "{empresa_cnpj}" não está presente no JSON.')
-
         print("ola")
-
 
         for customer in response_data:
             response_data_cpfCnpj = customer.get('cpfCnpj', '')
