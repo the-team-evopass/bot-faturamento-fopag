@@ -20,7 +20,7 @@ def generateExtractRequest(competence, due_date, students, summary, total_amount
     payload_json = json.dumps(payload)
 
     response = requests.post(url, headers=headers, data=payload_json)
-    print(response.text)
+    # print(response.text)
 
     return response.text
 
