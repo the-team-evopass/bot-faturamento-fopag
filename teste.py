@@ -1,4 +1,5 @@
 import json
+import time
 import requests
 from tabulate import tabulate
 from calculoprorata import calcular_prorata
