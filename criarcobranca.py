@@ -9,8 +9,8 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
             return
         response_json = response.json()
         response_data = response_json.get('data', [])
-
-        print("ola")
+        
+        cnpj_priocurado = empresa_cnpj
 
         for customer in response_data:
             response_data_cpfCnpj = customer.get('cpfCnpj', '')
@@ -29,7 +29,7 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
                     'dueDate': data_vencimento,
                     'description': 'Cobrança para cliente'
                 }
-
+                
                 # Criar a cobrança para o cliente
                 invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
 
@@ -37,9 +37,11 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
                     print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
                 else:
                     print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}, CNPJ/CPF: {response_data_cpfCnpj}, erro: {invoice_response.status_code}")
-            else:
-                print(f"O cnpj do asaas:{response_data_cpfCnpj} não é igual ao cnpj atual: {empresa_cnpj}")
-            
+                    
+                break      
+        else:
+            # Este bloco será executado se o loop for concluído sem o break (ou seja, se response_data_cpfCnpj não for encontrado)
+            print(f"Cliente com CNPJ/CPF {empresa_cnpj} não encontrado.")
 
     except Exception as e:
         print(f"Erro inesperado: {str(e)}")

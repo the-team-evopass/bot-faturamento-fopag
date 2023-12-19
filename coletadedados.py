@@ -5,6 +5,7 @@ from calculoprorata import calcular_prorata
 from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
 from criarcobranca import criar_cobrancas
+from functions.generateExtract import generateExtractRequest
 
 # URLs DAS APIs
 urlAllCompany = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements%2Cstudents'
@@ -23,7 +24,7 @@ cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das c
 dados_extrato = []
 dados_relatorio = []
 
-dia_emissao = 20
+dia_emissao = 20 #Substituir por datetime.now()
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -113,12 +114,30 @@ if respostaAllCompany.status_code == 200:
                             contador_titulares_prorata += 1
                             soma_valor_titulares_prorata += float(titular_studentAgreement_value)
 
-                            dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, valor_calculo_prorata, titular_studentAgreement_value, valor_mensal_titular])
+                            dados_extrato.append(
+                                            {
+                                                "name": titular_firstName,
+                                                "relationship": "TITULAR",
+                                                "cpf": titular_cpf,
+                                                "proRata": valor_calculo_prorata,
+                                                "value":  titular_studentAgreement_value,
+                                                "totalValue": valor_mensal_titular
+                                            }
+                                        )
 
                         else:
                             valor_mensal_titular = titular_studentAgreement_value
-                            
-                            dados_extrato.append([titular_firstName, "TITULAR", titular_cpf, "-", titular_studentAgreement_value, valor_mensal_titular])
+
+                            dados_extrato.append(
+                                            {
+                                                "name": titular_firstName,
+                                                "relationship": "TITULAR",
+                                                "cpf": titular_cpf,
+                                                "proRata": "-",
+                                                "value":  titular_studentAgreement_value,
+                                                "totalValue": valor_mensal_titular
+                                            }
+                                        )
 
                         
                         
@@ -151,36 +170,69 @@ if respostaAllCompany.status_code == 200:
                                         valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
                                         valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
 
-                                        dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, float(valor_calculo_prorata), float(dependente_studentAgreement_value), float(valor_mensal_dependente)])
+                                        dados_extrato.append(
+                                            {
+                                                "name": dependente_firstName,
+                                                "relationship": "DEPENDENTE",
+                                                "cpf": titular_cpf,
+                                                "proRata": valor_calculo_prorata,
+                                                "value":  dependente_studentAgreement_value,
+                                                "totalValue": valor_mensal_dependente
+                                            }
+                                        )
 
                                     else:
                                         valor_mensal_dependente = dependente_studentAgreement_value
                                         
-                                        dados_extrato.append([dependente_firstName, "DEPENDENTE", titular_cpf, "-", float(dependente_studentAgreement_value), float(valor_mensal_dependente)])
+                                        dados_extrato.append(
+                                            {
+                                                "name": dependente_firstName,
+                                                "relationship": "DEPENDENTE",
+                                                "cpf": titular_cpf,
+                                                "proRata": "-",
+                                                "value":  dependente_studentAgreement_value,
+                                                "totalValue": valor_mensal_dependente
+                                            }
+                                        )
 
                                     contagem_value_dependente += float(valor_mensal_dependente)
 
-            dados_relatorio.append(["Pró rata - Titulares", contador_titulares_prorata, float(soma_valor_titulares_prorata)])
-            dados_relatorio.append(["Mensalidade - Titulares", contador_titulares_empresa, float(soma_valor_mensalidade_titulares)])
-
-            dados_relatorio.append(["Pró rata - Dependentes", contador_dependentes_prorata, float(soma_valor_dependentes_prorata)])
-            dados_relatorio.append(["Mensalidade - Dependentes", contador_dependentes_empresa, float(soma_valor_mensalidade_dependentes)])
+            dados_relatorio.append({
+                "refence": "Pró rata - Titulares",
+                "quantity": contador_titulares_prorata,
+                "value": float(soma_valor_titulares_prorata)
+            })
+            dados_relatorio.append({
+                "refence": "Mensalidade  - Titulares",
+                "quantity": contador_titulares_empresa,
+                "value": soma_valor_mensalidade_titulares
+            })
+            dados_relatorio.append({
+                "refence": "Pró rata - Dependentes",
+                "quantity": contador_dependentes_prorata,
+                "value": soma_valor_dependentes_prorata
+            })
+            dados_relatorio.append({
+                "refence": "Mensalidade - Dependentes",
+                "quantity": contador_dependentes_empresa,
+                "value": soma_valor_mensalidade_dependentes
+            })
 
             valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
             valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
-            dados_relatorio.append(["Total", "", float(valor_soma_total)])
+            dados_relatorio.append({
+                "total_amount": valor_soma_total
+            })
+
+            dados_relatorio.append({
+                "instructions": "Teste."
+            })
 
             print(f"Competência: {competencia_mes_ano}")
             print(f"Data de Vencimento: {data_vencimento}")
-                                    
-            print(tabulate(dados_extrato, headers=cabecalhos_extrato, tablefmt="grid"))
-            print(tabulate(dados_relatorio, headers=cabecalhos_relatorio, tablefmt="grid"))
 
-            # # json.dumps para converter a lista de dicionários em uma string JSON
-            # tabela_json_extrato = json.dumps(dados_extrato)
-            # tabela_json_relatorio = json.dumps(dados_relatorio)
-            # print(tabela_json_extrato)
-            # print(tabela_json_relatorio)
+            print(dados_extrato)
+            print(dados_relatorio)
 
             #CRIAR COBRANÇA
             #Api do asaas
@@ -201,9 +253,14 @@ if respostaAllCompany.status_code == 200:
 
             if response.status_code == 200:
                 #Função para Criar Cobrança
-                criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
+                #criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
+
+                #Alimentar pdf da empresa atual
+                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, "teste")
+
             else:
                 print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
-                print(f"Resposta: {response.text}")    
+                print(f"Resposta: {response.text}")                 
+                
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
