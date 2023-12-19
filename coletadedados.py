@@ -103,7 +103,7 @@ if respostaAllCompany.status_code == 200:
                     
                 if titular_status == True and titular_studentAgreement_type == "F":
                     if titular_companyCNPJ == empresa_cnpj:
-                        entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-12-05
+                        entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%dT%H:%M:%S.%fZ') #Data que o aluno iniciou na empresa | 2023-12-05
                         entrada_aluno_date = entrada_titular.date() #Entrada de aluno em Data 05/12/2023
                         contador_titulares_empresa += 1
                         soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
@@ -119,9 +119,9 @@ if respostaAllCompany.status_code == 200:
                                                 "name": titular_firstName,
                                                 "relationship": "TITULAR",
                                                 "cpf": titular_cpf,
-                                                "proRata": valor_calculo_prorata,
-                                                "value":  titular_studentAgreement_value,
-                                                "totalValue": valor_mensal_titular
+                                                "proRata": float(valor_calculo_prorata),
+                                                "value":  float(titular_studentAgreement_value),
+                                                "totalValue": float(valor_mensal_titular)
                                             }
                                         )
 
@@ -133,9 +133,9 @@ if respostaAllCompany.status_code == 200:
                                                 "name": titular_firstName,
                                                 "relationship": "TITULAR",
                                                 "cpf": titular_cpf,
-                                                "proRata": "-",
-                                                "value":  titular_studentAgreement_value,
-                                                "totalValue": valor_mensal_titular
+                                                "proRata": 1,
+                                                "value":  float(titular_studentAgreement_value),
+                                                "totalValue": float(valor_mensal_titular)
                                             }
                                         )
 
@@ -161,7 +161,7 @@ if respostaAllCompany.status_code == 200:
                                     contador_dependentes_empresa += 1
                                     soma_valor_mensalidade_dependentes += float(dependente_studentAgreement_value)
 
-                                    entrada_dependente = datetime.strptime(dependente_startValidity, '%Y-%m-%d') #Data que o aluno iniciou na empresa | 2023-10-01
+                                    entrada_dependente = datetime.strptime(dependente_startValidity, '%Y-%m-%dT%H:%M:%S.%fZ') #Data que o aluno iniciou na empresa | 2023-10-01
                                     entrada_aluno_date = entrada_dependente.date() #Entrada de aluno em Data 01/10/2023
                             
                                     if emissao_menos_mes < entrada_aluno_date:
@@ -175,9 +175,9 @@ if respostaAllCompany.status_code == 200:
                                                 "name": dependente_firstName,
                                                 "relationship": "DEPENDENTE",
                                                 "cpf": titular_cpf,
-                                                "proRata": valor_calculo_prorata,
-                                                "value":  dependente_studentAgreement_value,
-                                                "totalValue": valor_mensal_dependente
+                                                "proRata": float(valor_calculo_prorata),
+                                                "value":  float(dependente_studentAgreement_value),
+                                                "totalValue": float(valor_mensal_dependente)
                                             }
                                         )
 
@@ -189,44 +189,46 @@ if respostaAllCompany.status_code == 200:
                                                 "name": dependente_firstName,
                                                 "relationship": "DEPENDENTE",
                                                 "cpf": titular_cpf,
-                                                "proRata": "-",
-                                                "value":  dependente_studentAgreement_value,
-                                                "totalValue": valor_mensal_dependente
+                                                "proRata": 1,
+                                                "value":  float(dependente_studentAgreement_value),
+                                                "totalValue": float(valor_mensal_dependente)
                                             }
                                         )
 
                                     contagem_value_dependente += float(valor_mensal_dependente)
 
             dados_relatorio.append({
-                "refence": "Pró rata - Titulares",
-                "quantity": contador_titulares_prorata,
+                "reference": "Pro rata - Titulares",
+                "quantity": float(contador_titulares_prorata),
                 "value": float(soma_valor_titulares_prorata)
             })
             dados_relatorio.append({
-                "refence": "Mensalidade  - Titulares",
-                "quantity": contador_titulares_empresa,
-                "value": soma_valor_mensalidade_titulares
+                "reference": "Mensalidade  - Titulares",
+                "quantity": float(contador_titulares_empresa),
+                "value": float(soma_valor_mensalidade_titulares)
             })
             dados_relatorio.append({
-                "refence": "Pró rata - Dependentes",
-                "quantity": contador_dependentes_prorata,
-                "value": soma_valor_dependentes_prorata
+                "reference": "Pro rata - Dependentes",
+                "quantity": float(contador_dependentes_prorata),
+                "value": float(soma_valor_dependentes_prorata)
             })
             dados_relatorio.append({
-                "refence": "Mensalidade - Dependentes",
-                "quantity": contador_dependentes_empresa,
-                "value": soma_valor_mensalidade_dependentes
+                "reference": "Mensalidade - Dependentes",
+                "quantity": float(contador_dependentes_empresa),
+                "value": float(soma_valor_mensalidade_dependentes)
             })
 
             valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
             valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
-            dados_relatorio.append({
-                "total_amount": valor_soma_total
-            })
 
-            dados_relatorio.append({
-                "instructions": "Teste."
-            })
+            # dados_relatorio.append({
+            #     "total_amount": float(valor_soma_total)
+            # })
+
+            # dados_relatorio.append({
+            #     "instructions": "Teste."
+            # })
+
 
             print(f"Competência: {competencia_mes_ano}")
             print(f"Data de Vencimento: {data_vencimento}")

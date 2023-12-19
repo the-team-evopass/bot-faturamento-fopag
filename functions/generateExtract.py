@@ -1,26 +1,28 @@
+from xmlrpc.client import ResponseError
 import requests
 import json
 
 def generateExtractRequest(competence, due_date, students, summary, total_amount, instructions):
-    url = "https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/generate_pdf/?id=4"
+    url = "https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/generate_pdf/?id=4"
 
-    payload = {
-        "competence": competence,
-        "dueDate": due_date,
-        "students": students,
-        "summary": summary,
-        "totalAmount": total_amount,
-        "instructions": instructions
-    }
+    payload = json.dumps({
+    "competence": competence,
+    "dueDate": due_date,
+    "students": students,
+    "summary": summary,
+    "totalAmount": total_amount,
+    "instructions": instructions
+    })
 
     headers = {
         'Content-Type': 'application/json'
     }
 
-    payload_json = json.dumps(payload)
+    # payload_json = payload
+    print(payload)
 
-    response = requests.post(url, headers=headers, data=payload_json)
-    # print(response.text)
+    response = requests.post(url, headers=headers, data=payload)
+    print(response)
 
     return response.text
 
