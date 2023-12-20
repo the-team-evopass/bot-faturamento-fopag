@@ -1,4 +1,5 @@
 import requests
+import json
 
 def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_total_empresa, headers, data_vencimento):
     try:
@@ -9,14 +10,9 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
             return
         response_json = response.json()
         response_data = response_json.get('data', [])
-        
-        cnpj_priocurado = empresa_cnpj
 
         for customer in response_data:
             response_data_cpfCnpj = customer.get('cpfCnpj', '')
-
-            # if response_data_cpfCnpj == "18313310000121":
-            #     print(f"Empresa Asaas: {response_data_cpfCnpj}")
 
             if response_data_cpfCnpj == empresa_cnpj:
                 # Criar uma cobrança para o cliente
@@ -34,7 +30,9 @@ def criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_tot
                 invoice_response = requests.post(urlCriarCobranca, headers=headers, json=invoice_data)
 
                 if invoice_response.status_code == 200:
+                    print('Response da minha emissão de boleto---------------------------------')
                     print(f"Cobrança criada com sucesso para o cliente ID: {customer_name}")
+                    return json.loads(invoice_response.content)['invoiceUrl']
                 else:
                     print(f"Erro ao criar a cobrança para o cliente ID: {customer_name}, CNPJ/CPF: {response_data_cpfCnpj}, erro: {invoice_response.status_code}")
                     

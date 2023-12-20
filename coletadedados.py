@@ -1,6 +1,5 @@
-import json
+from xml.sax.saxutils import prepare_input_source
 import requests
-from tabulate import tabulate
 from calculoprorata import calcular_prorata
 from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
@@ -24,7 +23,8 @@ cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das c
 dados_extrato = []
 dados_relatorio = []
 
-dia_emissao = 20 #Substituir por datetime.now()
+#Substituir por datetime.now() e extrair o dia
+dia_emissao = 20
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -41,6 +41,7 @@ if respostaAllCompany.status_code == 200:
     contador_empresas = 0
 
     for empresa in listaEmpresas:
+        empresa_id = empresa['id']
         empresa_cnpj = empresa['cnpj']  # Cnpj da empresa
         empresa_tradeName = empresa['tradeName']  # Nome da empresa
         empresa_companyStatus = empresa['companyStatus']  # Status da empresa
@@ -127,19 +128,16 @@ if respostaAllCompany.status_code == 200:
 
                         else:
                             valor_mensal_titular = titular_studentAgreement_value
-
                             dados_extrato.append(
                                             {
                                                 "name": titular_firstName,
                                                 "relationship": "TITULAR",
                                                 "cpf": titular_cpf,
-                                                "proRata": 1,
+                                                "proRata": 0,
                                                 "value":  float(titular_studentAgreement_value),
                                                 "totalValue": float(valor_mensal_titular)
                                             }
                                         )
-
-                        
                         
                         contagem_value_titular += float(valor_mensal_titular)
 
@@ -221,15 +219,6 @@ if respostaAllCompany.status_code == 200:
             valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
             valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
 
-            # dados_relatorio.append({
-            #     "total_amount": float(valor_soma_total)
-            # })
-
-            # dados_relatorio.append({
-            #     "instructions": "Teste."
-            # })
-
-
             print(f"Competência: {competencia_mes_ano}")
             print(f"Data de Vencimento: {data_vencimento}")
 
@@ -255,10 +244,12 @@ if respostaAllCompany.status_code == 200:
 
             if response.status_code == 200:
                 #Função para Criar Cobrança
-                #criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
+                paymentLink = criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
+
+                print(paymentLink)
 
                 #Alimentar pdf da empresa atual
-                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, "teste")
+                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, "teste")
 
             else:
                 print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
