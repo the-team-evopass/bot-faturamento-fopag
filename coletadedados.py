@@ -50,7 +50,7 @@ if respostaAllCompany.status_code == 200:
         dados_extrato = []
         dados_relatorio = []
 
-        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
+        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
             contagem_value_titular = 0
             contagem_value_dependente = 0
 
@@ -97,7 +97,8 @@ if respostaAllCompany.status_code == 200:
                 titular_cpf = titular['cpf']
                 titular_company = titular['company']
                 titular_companyCNPJ = titular['company']['cnpj']
-                titular_studentAgreement_value = titular['studentAgreement'][-1]['value']
+                titular_studentAgreement_value = float(1.99)
+                # titular_studentAgreement_value = titular['studentAgreement'][-1]['value']
                 titular_studentAgreement_type = titular['studentAgreement'][-1]['type']
 
                 valor_por_dia = float(titular_studentAgreement_value) / float(30.0)  # valor cobrado por dia
@@ -148,7 +149,8 @@ if respostaAllCompany.status_code == 200:
                             dependente_startValidity = dependente['startValidity']
                             dependente_cpf = dependente['cpf']
                             dependente_student_cpf = dependente['student']['cpf']
-                            dependente_studentAgreement_value = dependente['dependentAgreement'][-1]['value']
+                            dependente_studentAgreement_value = float(1.99)
+                            # dependente_studentAgreement_value = dependente['dependentAgreement'][-1]['value']
                             dependente_studentAgreement_type = dependente['dependentAgreement'][-1]['type']
                             dependente_startValidity = dependente['startValidity']
 
@@ -187,7 +189,7 @@ if respostaAllCompany.status_code == 200:
                                                 "name": dependente_firstName,
                                                 "relationship": "DEPENDENTE",
                                                 "cpf": titular_cpf,
-                                                "proRata": 1,
+                                                "proRata": 0,
                                                 "value":  float(dependente_studentAgreement_value),
                                                 "totalValue": float(valor_mensal_dependente)
                                             }
@@ -227,11 +229,11 @@ if respostaAllCompany.status_code == 200:
 
             #CRIAR COBRANÇA
             #Api do asaas
-            api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoX2QyMGQ0MGYwLWYwZTEtNDI5NS1iYmRlLTIyNzFjMTZlNjZhNw=='
+            api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAzNzY1NDY6OiRhYWNoXzRhMTg1MzQzLWJkMzEtNDRlNC1iMTMxLTQ0MDM0M2JlZmZmYw=='
 
             #URLs do asaas
-            urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers?limit=100'
-            urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
+            urlListarClientes = 'https://api.asaas.com/v3/customers?limit=100'
+            urlCriarCobranca = 'https://api.asaas.com/v3/payments'
 
             #Cabeçalho
             headers = {
@@ -246,14 +248,21 @@ if respostaAllCompany.status_code == 200:
                 #Função para Criar Cobrança
                 paymentLink = criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
 
-                print(paymentLink)
+                extractObservation = '''
+                    Prezado(a) cliente,
+                    Para visualizar e efetuar o pagamento do boleto, acesse o link fornecido.
+                    Qualquer problema ou dificuldade, entre em contato conosco.
+                    Agradecemos pela sua atenção.
+                '''
 
                 #Alimentar pdf da empresa atual
-                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, "teste")
+                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, paymentLink)
 
             else:
                 print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
-                print(f"Resposta: {response.text}")                 
+                print(f"Resposta: {response.text}")     
+    else:
+        print('Não entrou no if - seleção de empresas')            
                 
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
