@@ -262,7 +262,6 @@ if respostaAllCompany.status_code == 200:
                 print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
                 print(f"Resposta: {response.text}")     
     else:
-        print('Não entrou no if - seleção de empresas')            
-                
+        print('Não entrou no if - seleção de empresas')               
 else:
     print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
