@@ -97,8 +97,7 @@ if respostaAllCompany.status_code == 200:
                 titular_cpf = titular['cpf']
                 titular_company = titular['company']
                 titular_companyCNPJ = titular['company']['cnpj']
-                titular_studentAgreement_value = float(1.99)
-                # titular_studentAgreement_value = titular['studentAgreement'][-1]['value']
+                titular_studentAgreement_value = titular['studentAgreement'][-1]['value']
                 titular_studentAgreement_type = titular['studentAgreement'][-1]['type']
 
                 valor_por_dia = float(titular_studentAgreement_value) / float(30.0)  # valor cobrado por dia
@@ -117,28 +116,28 @@ if respostaAllCompany.status_code == 200:
                             soma_valor_titulares_prorata += float(titular_studentAgreement_value)
 
                             dados_extrato.append(
-                                            {
-                                                "name": titular_firstName,
-                                                "relationship": "TITULAR",
-                                                "cpf": titular_cpf,
-                                                "proRata": float(valor_calculo_prorata),
-                                                "value":  float(titular_studentAgreement_value),
-                                                "totalValue": float(valor_mensal_titular)
-                                            }
-                                        )
+                                {
+                                    "name": titular_firstName,
+                                    "relationship": "TITULAR",
+                                    "cpf": titular_cpf,
+                                    "proRata": float(valor_calculo_prorata),
+                                    "value":  float(titular_studentAgreement_value),
+                                    "totalValue": float(valor_mensal_titular)
+                                }
+                            )
 
                         else:
                             valor_mensal_titular = titular_studentAgreement_value
                             dados_extrato.append(
-                                            {
-                                                "name": titular_firstName,
-                                                "relationship": "TITULAR",
-                                                "cpf": titular_cpf,
-                                                "proRata": 0,
-                                                "value":  float(titular_studentAgreement_value),
-                                                "totalValue": float(valor_mensal_titular)
-                                            }
-                                        )
+                                {
+                                    "name": titular_firstName,
+                                    "relationship": "TITULAR",
+                                    "cpf": titular_cpf,
+                                    "proRata": 0,
+                                    "value":  float(titular_studentAgreement_value),
+                                    "totalValue": float(valor_mensal_titular)
+                                }
+                            )
                         
                         contagem_value_titular += float(valor_mensal_titular)
 
@@ -149,8 +148,7 @@ if respostaAllCompany.status_code == 200:
                             dependente_startValidity = dependente['startValidity']
                             dependente_cpf = dependente['cpf']
                             dependente_student_cpf = dependente['student']['cpf']
-                            dependente_studentAgreement_value = float(1.99)
-                            # dependente_studentAgreement_value = dependente['dependentAgreement'][-1]['value']
+                            dependente_studentAgreement_value = dependente['dependentAgreement'][-1]['value']
                             dependente_studentAgreement_type = dependente['dependentAgreement'][-1]['type']
                             dependente_startValidity = dependente['startValidity']
 
@@ -229,11 +227,12 @@ if respostaAllCompany.status_code == 200:
 
             #CRIAR COBRANÇA
             #Api do asaas
+            # Trocar o token do sandbox
             api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAzNzY1NDY6OiRhYWNoXzRhMTg1MzQzLWJkMzEtNDRlNC1iMTMxLTQ0MDM0M2JlZmZmYw=='
 
             #URLs do asaas
-            urlListarClientes = 'https://api.asaas.com/v3/customers?limit=100'
-            urlCriarCobranca = 'https://api.asaas.com/v3/payments'
+            urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers?limit=100'
+            urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
 
             #Cabeçalho
             headers = {
