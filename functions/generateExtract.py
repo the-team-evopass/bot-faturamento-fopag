@@ -2,7 +2,7 @@ from xmlrpc.client import ResponseError
 import requests
 import json
 
-def generateExtractRequest(competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl):
+def generateExtractRequest(competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
     url = f"https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/generate_pdf/?id={idCompany}"
 
     payload = json.dumps({
@@ -13,6 +13,8 @@ def generateExtractRequest(competence, due_date, students, summary, total_amount
         "totalAmount": total_amount,
         "instructions": instructions,
         'invoiceUrl': invoiceUrl,
+        "tradeName": tradeName,
+        "cnpj": cnpj
     })
 
     headers = {
@@ -20,9 +22,10 @@ def generateExtractRequest(competence, due_date, students, summary, total_amount
     }
 
     # payload_json = payload
-    print(payload)
+    # print(payload)
 
     response = requests.post(url, headers=headers, data=payload)
+
     print(response)
 
     return response.text

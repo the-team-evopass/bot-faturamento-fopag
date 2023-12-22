@@ -24,7 +24,7 @@ dados_extrato = []
 dados_relatorio = []
 
 #Substituir por datetime.now() e extrair o dia
-dia_emissao = 20
+dia_emissao = 25
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -50,7 +50,8 @@ if respostaAllCompany.status_code == 200:
         dados_extrato = []
         dados_relatorio = []
 
-        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
+        # if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
+        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
             contagem_value_titular = 0
             contagem_value_dependente = 0
 
@@ -67,7 +68,7 @@ if respostaAllCompany.status_code == 200:
             contador_dependentes_empresa_temp = 0
 
             # Filtro das empresas que têm a data de corte igual ao dia atual
-            print(f"Relação de ativos da empresa {empresa_tradeName} .")
+            print(f"Faturamento da empresa {empresa_tradeName} .")
 
             # Tratamento de dados das datas de emissão de boleto e data start do aluno
             data_atual = datetime.now()
@@ -221,31 +222,33 @@ if respostaAllCompany.status_code == 200:
 
             print(f"Competência: {competencia_mes_ano}")
             print(f"Data de Vencimento: {data_vencimento}")
+            # print(dados_extrato)
+            # print(dados_relatorio)
 
-            print(dados_extrato)
-            print(dados_relatorio)
 
-            #CRIAR COBRANÇA
-            #Api do asaas
-            # Trocar o token do sandbox
-            api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAzNzY1NDY6OiRhYWNoXzRhMTg1MzQzLWJkMzEtNDRlNC1iMTMxLTQ0MDM0M2JlZmZmYw=='
+            # api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoX2Q3ZDk0MDBhLThmYjAtNDZjNC1iNDMxLTZiMjYyYTJjMzFjMQ=='
 
-            #URLs do asaas
-            urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers?limit=100'
-            urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
+            # #URLs do asaas
+            # urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers?limit=100'
+            # urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
 
-            #Cabeçalho
-            headers = {
-                'Content-Type': 'application/json',
-                'access_token': api_key
-            }
+            # #Cabeçalho
+            # headers = {
+            #     'Content-Type': 'application/json',
+            #     'access_token': api_key
+            # }
 
-            #Listar clientes
-            response = requests.get(urlListarClientes, headers=headers)
+            # #Listar clientes
+            # response = requests.get(urlListarClientes, headers=headers)
 
-            if response.status_code == 200:
+            # if response.status_code == 200:
                 #Função para Criar Cobrança
-                paymentLink = criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
+                # paymentLink = criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
+            
+            if valor_boleto_empresa != 0:
+
+                paymentLink = criar_cobrancas(empresa_cnpj, valor_boleto_empresa, data_vencimento)
+                print(paymentLink)
 
                 extractObservation = '''
                     Prezado(a) cliente,
@@ -253,15 +256,17 @@ if respostaAllCompany.status_code == 200:
                     Qualquer problema ou dificuldade, entre em contato conosco.
                     Agradecemos pela sua atenção.
                 '''
-
-                #Alimentar pdf da empresa atual
-                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, paymentLink)
+                #Estou gerando o PDF aqui
+                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, paymentLink, empresa_tradeName, empresa_cnpj)
+                
+                print('-------------------------------------------------------------------------------')
 
             else:
-                print(f"Erro ao listar os clientes. Status Code: {response.status_code}")
-                print(f"Resposta: {response.text}")     
+                print('Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados)')
+                print('-------------------------------------------------------------------------------')
+  
     else:
-        print('Não entrou no if - seleção de empresas')            
+        print('Não entrou no if - seleção de empresas (coletadedados)')            
                 
 else:
-    print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}")
+    print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}{' (coletadedados)'}")
