@@ -1,24 +1,34 @@
+from asyncio.windows_events import NULL
 import requests
 import json
 
 # Ao emitir uma NF, se atentar ao endereço da empresa... Se ele for da mesma cidade, devemos emitir a NF com o valor liquido (falar com o Felipe e a Carolina)
 
-def generateIssueNf(payment, installment, service_description, observations, value, deductions, effective_date, external_reference, taxes, municipal_service_id, municipal_service_code, municipal_service_name, access_token, cookie):
+def generateIssueNf(payment, value, deductions, effective_date, access_token, cookie):
     url = "https://sandbox.asaas.com/api/v3/invoices"
+
+    taxes =  {
+        "retainIss": False,
+        "iss": 2.5,
+        "cofins": 0,
+        "csll": 0,
+        "inss": 0,
+        "ir": 0,
+        "pis": 0
+    },
 
     payload = {
         "payment": payment,
-        "installment": installment,
-        "serviceDescription": service_description,
-        "observations": observations,
+        "installment": NULL,
+        "serviceDescription": 'mocar valor',
+        "observations": 'mocar valor',
         "value": value,
         "deductions": deductions,
         "effectiveDate": effective_date,
-        "externalReference": external_reference,
         "taxes": taxes,
-        "municipalServiceId": municipal_service_id,
-        "municipalServiceCode": municipal_service_code,
-        "municipalServiceName": municipal_service_name
+        "municipalServiceId": NULL,
+        "municipalServiceCode": "10.05",
+        "municipalServiceName": "INTERMEDIACAO DE NEGOCIOS"
     }
 
     headers = {
