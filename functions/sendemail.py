@@ -2,35 +2,26 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-# Configurações do servidor SMTP e credenciais
-smtplib_server = 'smtp.live.com'
-smtplib_port = 587 
-smtplib_username = 'gabriel.lima@academiaevoque.com.br'
-smtplib_password = 'Ja921600'
+def send_email(assunto, para, html):            
+    # Configurações da conta SendGrid
+    Username = "apikey"
+    Password = "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"
 
-# Destinatário e informações do e-mail
-destinatario = 'limaruasgabriel@gmail.com'
-assunto = 'Assunto do email'
+    # Criar objeto EmailMessage
+    msg = MIMEMultipart('alternative')
+    # msg.attach(MIMEText("<div style='background-color: #f5f5f5;'>Teste</div>", 'html'))
+    msg.attach(MIMEText(html, 'html'))
 
-# Criar o objeto MIMEMultipart para o e-mail
-mensagem = MIMEMultipart()
-mensagem['From'] = smtplib_username
-mensagem['To'] = destinatario
-mensagem['Subject'] = assunto
+    # Configurar cabeçalhos
+    msg['Subject'] = assunto
+    msg['From'] = "cobranca@evopass.app.br"
+    msg['To'] = para
 
-# Adicionar o corpo do e-mail (pode adicionar HTML se desejar)
-corpo_email = 'Corpo do seu e-mail aqui.'
-mensagem.attach(MIMEText(corpo_email, 'plain'))
+    # Conectar e enviar e-mail usando SMTP_SSL
+    with smtplib.SMTP_SSL('smtp.sendgrid.net', 465) as smtp:
+        smtp.login(Username, Password)
+        smtp.send_message(msg)
 
-try:
-    # Configurar a conexão SMTP sem STARTTLS
-    with smtplib.SMTP(smtplib_server, smtplib_port) as server:
-        # Login no servidor
-        server.login(smtplib_username, smtplib_password)
-
-        # Enviar o e-mail
-        server.sendmail(smtplib_username, destinatario, mensagem.as_string())
-        print(f'E-mail enviado com sucesso para {destinatario}: {assunto}')
-
-except Exception as e:
-    print(f'Erro ao enviar e-mail: {str(e)}')
+# send_email('Testando envio de html', 'felipe@evopass.app.br')
+# send_email('Faturamento Evopass', 'felipe@evopass.app.br', render_html('Felipe SA', '12/2023', '20,89', 'https://www.evopass.app.br', '9238409'))
+# send_email('Faturamento Evopass', 'felipemelo.unidade@gmail.com', myMail)

@@ -1,5 +1,3 @@
-import requests
-import json
 from functions.getListCustomers import getListCustomers
 from functions.searchCustumer import findIdCustumerByCNPJ
 from functions.generateBiling import generateBiling

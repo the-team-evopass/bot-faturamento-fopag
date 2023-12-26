@@ -5,6 +5,8 @@ from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
 from criarcobranca import criar_cobrancas
 from functions.generateExtract import generateExtractRequest
+from functions.render import render_html
+from functions.sendemail import send_email
 
 # URLs DAS APIs
 urlAllCompany = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements%2Cstudents'
@@ -256,9 +258,16 @@ if respostaAllCompany.status_code == 200:
                     Qualquer problema ou dificuldade, entre em contato conosco.
                     Agradecemos pela sua atenção.
                 '''
+
+                # Função para emissão de NF
+
                 #Estou gerando o PDF aqui
                 generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, paymentLink, empresa_tradeName, empresa_cnpj)
                 
+                myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), paymentLink, 'inv_000006811891')
+
+                send_email('Teste do bot de faturamento', 'felipemelo.unidade@gmail.com', myContentEmail)
+
                 print('-------------------------------------------------------------------------------')
 
             else:

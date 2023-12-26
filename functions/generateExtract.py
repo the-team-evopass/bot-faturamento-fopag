@@ -21,9 +21,6 @@ def generateExtractRequest(competence, due_date, students, summary, total_amount
         'Content-Type': 'application/json'
     }
 
-    # payload_json = payload
-    # print(payload)
-
     response = requests.post(url, headers=headers, data=payload)
 
     print(response)
