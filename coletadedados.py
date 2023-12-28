@@ -5,6 +5,7 @@ from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
 from criarcobranca import criar_cobrancas
 from functions.generateExtract import generateExtractRequest
+from functions.issueNf import generateIssueNf
 from functions.render import render_html
 from functions.sendemail import send_email
 
@@ -26,7 +27,7 @@ dados_extrato = []
 dados_relatorio = []
 
 #Substituir por datetime.now() e extrair o dia
-dia_emissao = 25
+dia_emissao = 27
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -249,8 +250,9 @@ if respostaAllCompany.status_code == 200:
             
             if valor_boleto_empresa != 0:
 
-                paymentLink = criar_cobrancas(empresa_cnpj, valor_boleto_empresa, data_vencimento)
-                print(paymentLink)
+                billingResponse = criar_cobrancas(empresa_cnpj, valor_boleto_empresa, data_vencimento)
+                
+                print(billingResponse['billingURL'])
 
                 extractObservation = '''
                     Prezado(a) cliente,
@@ -260,13 +262,14 @@ if respostaAllCompany.status_code == 200:
                 '''
 
                 # Função para emissão de NF
+                generateIssueNf(billingResponse['billingID'], valor_boleto_empresa, '2023-12-28')
 
                 #Estou gerando o PDF aqui
-                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, paymentLink, empresa_tradeName, empresa_cnpj)
+                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
                 
-                myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), paymentLink, 'inv_000006811891')
+                # myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
 
-                send_email('Teste do bot de faturamento', 'felipemelo.unidade@gmail.com', myContentEmail)
+                # send_email('Teste do bot de faturamento', 'felipemelo.unidade@gmail.com', myContentEmail)
 
                 print('-------------------------------------------------------------------------------')
 

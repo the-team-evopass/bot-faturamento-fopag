@@ -43,9 +43,6 @@ def generateIssueNf(payment, value, effective_date):
     if response.status_code != 200:
         print('Erro ao emitir nota fiscal no asaas ' + str(response.status_code) + ' || ' + response.text + ' (issueNF)')
 
-    print(json.loads(response.content))
+    # print(json.loads(response.content))
 
     return response.text
-
-
-generateIssueNf('pay_4308258900251291', 10, '2023-12-23')

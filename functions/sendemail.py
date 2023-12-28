@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 def send_email(assunto, para, html):            
     # Configurações da conta SendGrid
     Username = "apikey"
-    Password = "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"
+    Password = "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"
 
     # Criar objeto EmailMessage
     msg = MIMEMultipart('alternative')
