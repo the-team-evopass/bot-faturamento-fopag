@@ -26,9 +26,10 @@ Produção:
 ```
 
 ⚠️ **Atenção:**
-Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
-
-<hr>
+<br>
+<span style="background-color:#fdece9">
+   Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
+</span>
 
 Depois da MY_AMBIENT_VAR, temos mais duas variaveis. O objetivo delas é armazenar os seguintes tokens:
 
