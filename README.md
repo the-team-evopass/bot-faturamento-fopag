@@ -27,7 +27,7 @@ Produção:
 
 ⚠️ **Atenção:**
 <br>
-<span style="background-color:#fdece9">
+<span style="color:red">
    Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
 </span>
 
