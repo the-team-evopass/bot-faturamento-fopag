@@ -25,11 +25,9 @@ Produção:
    export MY_AMBIENT_VAR='prod'; python functions/coletadedados.py
 ```
 
-⚠️ **Atenção:**
+**Atenção:**
 <br>
-<span style="color:red">
-   Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
-</span>
+Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
 
 Depois da MY_AMBIENT_VAR, temos mais duas variaveis. O objetivo delas é armazenar os seguintes tokens:
 
@@ -38,6 +36,8 @@ Depois da MY_AMBIENT_VAR, temos mais duas variaveis. O objetivo delas é armazen
 
 - Token de autenticação para a API de desenvolvimento
    - Nome: ASAAS_SANDBOX_TOKEN
+
+As variaveis descritas acima, devem ficar declaradas dentro do arquivo ".env" conforme explicado.
 
 ### Fluxo de funcionamento
 
