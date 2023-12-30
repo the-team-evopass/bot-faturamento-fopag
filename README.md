@@ -17,18 +17,26 @@ Esse projeto faz uso das variaveis de ambiente. a variavel myEnv é usada para d
 
 Desenvolvimento:
 ```bash
-   export myEnv='dev'; python functions/environment/environmentAccess.py
+   export MY_AMBIENT_VAR='dev'; python functions/coletadedados.py
 ```
 
 Produção:
 ```bash
-
-   export myEnv='dev'; python functions/environment/environmentAccess.py
-
+   export MY_AMBIENT_VAR='prod'; python functions/coletadedados.py
 ```
 
 ⚠️ **Atenção:**
 Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
+
+<hr>
+
+Depois da MY_AMBIENT_VAR, temos mais duas variaveis. O objetivo delas é armazenar os seguintes tokens:
+
+- Token de autenticação para a API de produção do Asaas
+   - Nome: ASAAS_TOKEN
+
+- Token de autenticação para a API de desenvolvimento
+   - Nome: ASAAS_SANDBOX_TOKEN
 
 ### Fluxo de funcionamento
 
