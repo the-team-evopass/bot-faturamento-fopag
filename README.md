@@ -1,4 +1,4 @@
-# Bot de faturamento para cobranças em boletos
+# Bot de faturamento para cobranças B2B
 
 Esse projeto é responsáve pela emissão de:
 - Boleto
@@ -7,7 +7,7 @@ Esse projeto é responsáve pela emissão de:
 
 Para cada faturamento realizado, ele envia um email com as informações de cobrança.
 
-## Explicando fluxo de funcionamento e configuração
+## Fluxo de funcionamento e configuração
 
 ### Variaveis de ambiente
 
@@ -15,19 +15,19 @@ Esse projeto faz uso das variaveis de ambiente. a variavel myEnv é usada para d
 
 - Para rodar o projeto em sua máquina com a variavel de ambinete, basta replicar o código abaixo:
 
-Para rodar em desenvolvimento:
+Desenvolvimento:
 ```bash
    export myEnv='dev'; python functions/environment/environmentAccess.py
 ```
 
-Para rodar em produção:
+Produção:
 ```bash
 
    export myEnv='dev'; python functions/environment/environmentAccess.py
-   
+
 ```
 
-Atenção!
+⚠️ **Atenção:**
 Caso a variavel de ambinete não seja informada, a aplicação será iniciada no ambinete de produção.
 
 ### Fluxo de funcionamento
