@@ -1,11 +1,10 @@
-from xml.sax.saxutils import prepare_input_source
 import requests
 from calculoprorata import calcular_prorata
 from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
-from criarcobranca import criar_cobrancas
+from functions.criarCobranca import criar_cobranca
 from functions.generateExtract import generateExtractRequest
-from functions.issueNf import generateIssueNf
+from middleware import runGenerateIssueNf
 from functions.render import render_html
 from functions.sendemail import send_email
 
@@ -225,32 +224,10 @@ if respostaAllCompany.status_code == 200:
 
             print(f"Competência: {competencia_mes_ano}")
             print(f"Data de Vencimento: {data_vencimento}")
-            # print(dados_extrato)
-            # print(dados_relatorio)
 
-
-            # api_key = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoX2Q3ZDk0MDBhLThmYjAtNDZjNC1iNDMxLTZiMjYyYTJjMzFjMQ=='
-
-            # #URLs do asaas
-            # urlListarClientes = 'https://sandbox.asaas.com/api/v3/customers?limit=100'
-            # urlCriarCobranca = 'https://sandbox.asaas.com/api/v3/payments'
-
-            # #Cabeçalho
-            # headers = {
-            #     'Content-Type': 'application/json',
-            #     'access_token': api_key
-            # }
-
-            # #Listar clientes
-            # response = requests.get(urlListarClientes, headers=headers)
-
-            # if response.status_code == 200:
-                #Função para Criar Cobrança
-                # paymentLink = criar_cobrancas(urlListarClientes, urlCriarCobranca, empresa_cnpj, valor_boleto_empresa, headers, data_vencimento)
-            
             if valor_boleto_empresa != 0:
 
-                billingResponse = criar_cobrancas(empresa_cnpj, valor_boleto_empresa, data_vencimento)
+                billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
                 
                 print(billingResponse['billingURL'])
 
@@ -262,14 +239,16 @@ if respostaAllCompany.status_code == 200:
                 '''
 
                 # Função para emissão de NF
-                generateIssueNf(billingResponse['billingID'], valor_boleto_empresa, '2023-12-28')
+                runGenerateIssueNf(billingResponse['billingID'], valor_boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
 
                 #Estou gerando o PDF aqui
                 generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
                 
-                # myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
 
-                # send_email('Teste do bot de faturamento', 'felipemelo.unidade@gmail.com', myContentEmail)
+
+                myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
+
+                send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
 
                 print('-------------------------------------------------------------------------------')
 

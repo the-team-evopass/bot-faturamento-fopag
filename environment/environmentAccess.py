@@ -1,25 +1,27 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def getEnvironmentVar(type) :
 
     if type == 'ambient' :
 
-        valorVariavelAmbiente = os.environ.get('MY_AMBIENT_VAR')
+        environmentValue = os.environ.get('MY_AMBIENT_VAR')
 
-        if valorVariavelAmbiente:
-            print(f'Rodando em : {valorVariavelAmbiente}')
+        if environmentValue:
             return 'dev'
         else:
-            valorVariavelAmbiente = 'prod'
-            print('Valor da variavel de ambiente não configurada, prod como default.')
+            environmentValue = 'prod'
             return 'prod'
         
     elif type == 'devAccessToken' :
 
-        print('Pegar token de produção')
+        return os.environ.get('ASAAS_SANDBOX_TOKEN')
 
-    elif type == 'devAccessToken' :
+    elif type == 'prodAccessToken' :
 
-        print('Pegar token de desenvolvimento')
-
-getEnvironmentVar('ambient')
+        return os.environ.get('ASAAS_TOKEN')
+    
+    else :
+        print(f'Erro ao acessar a variável de ambiente do tipo: {type} || (environmentAccess)')

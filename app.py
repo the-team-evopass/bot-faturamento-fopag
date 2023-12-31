@@ -1,5 +1,5 @@
 from flask import Flask
-import criarcobranca
+import functions.criarcobranca as criarcobranca
 
 app = Flask(__name__)
 

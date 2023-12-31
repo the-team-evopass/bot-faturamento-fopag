@@ -17,12 +17,12 @@ Esse projeto faz uso das variaveis de ambiente. a variavel myEnv é usada para d
 
 Desenvolvimento:
 ```bash
-   export MY_AMBIENT_VAR='dev'; python functions/coletadedados.py
+   export MY_AMBIENT_VAR='dev'; python coletadedados.py
 ```
 
 Produção:
 ```bash
-   export MY_AMBIENT_VAR='prod'; python functions/coletadedados.py
+   export MY_AMBIENT_VAR='prod'; python coletadedados.py
 ```
 
 **Atenção:**
