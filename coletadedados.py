@@ -1,4 +1,5 @@
 import requests
+from termcolor import colored
 from calculoprorata import calcular_prorata
 from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
@@ -70,7 +71,7 @@ if respostaAllCompany.status_code == 200:
             contador_dependentes_empresa_temp = 0
 
             # Filtro das empresas que têm a data de corte igual ao dia atual
-            print(f"Faturamento da empresa {empresa_tradeName} .")
+            print(colored(f"Faturamento da empresa {empresa_tradeName}.", 'blue'))
 
             # Tratamento de dados das datas de emissão de boleto e data start do aluno
             data_atual = datetime.now()
@@ -222,14 +223,14 @@ if respostaAllCompany.status_code == 200:
             valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
             valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
 
-            print(f"Competência: {competencia_mes_ano}")
-            print(f"Data de Vencimento: {data_vencimento}")
+            print(colored(f"Competência: {competencia_mes_ano}", 'blue'))
+            print(colored(f"Data de Vencimento: {data_vencimento}", 'blue'))
 
             if valor_boleto_empresa != 0:
 
                 billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
                 
-                print(billingResponse['billingURL'])
+                print(colored(billingResponse['billingURL'], 'green'))
 
                 extractObservation = '''
                     Prezado(a) cliente,
@@ -244,13 +245,11 @@ if respostaAllCompany.status_code == 200:
                 #Estou gerando o PDF aqui
                 generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
                 
-
-
                 myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
 
                 send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
 
-                print('-------------------------------------------------------------------------------')
+                print(colored('-------------------------------------------------------------------------------', 'yellow', 'on_green', ['underline']))
 
             else:
                 print('Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados)')

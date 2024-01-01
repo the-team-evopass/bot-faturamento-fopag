@@ -1,3 +1,5 @@
+from termcolor import colored
+
 from environment.environmentAccess import getEnvironmentVar
 from baseURL.getBaseURL import getBaseURL
 
@@ -35,10 +37,13 @@ def runGenerateIssueNf (payment, value, effectiveDate) :
 
     if configEnvironmentVars()['ambient'] == 'dev' :
 
-        print('NF emitida com os seguintes parametros:')
-        print(f'paymentId: {payment}')
-        print(f'value: {value}')
-        print(f'effectiveDate: {effectiveDate}')
+        print(colored('NF emitida com os seguintes parametros:', 'yellow'))
+        print(colored(f'paymentId: {payment}', 'yellow'))
+        print(colored(f'value: {value}', 'yellow'))
+        print(colored(f'effectiveDate: {effectiveDate}', 'yellow'))
+        print(colored('Retornando id da nota fiscal teste || inv_000006821889 || (middleware)', 'yellow'))
+
+        return 'inv_000006821889'
 
     else :
         

@@ -6,15 +6,9 @@ load_dotenv()
 def getEnvironmentVar(type) :
 
     if type == 'ambient' :
+      
+        return os.environ.get('MY_AMBIENT_VAR')
 
-        environmentValue = os.environ.get('MY_AMBIENT_VAR')
-
-        if environmentValue:
-            return 'dev'
-        else:
-            environmentValue = 'prod'
-            return 'prod'
-        
     elif type == 'devAccessToken' :
 
         return os.environ.get('ASAAS_SANDBOX_TOKEN')

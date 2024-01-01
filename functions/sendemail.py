@@ -3,25 +3,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 def send_email(assunto, para, html):            
-    # Configurações da conta SendGrid
-    Username = "apikey"
-    Password = "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"
 
-    # Criar objeto EmailMessage
+    username = "apikey"
+    password = "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"
+
     msg = MIMEMultipart('alternative')
-    # msg.attach(MIMEText("<div style='background-color: #f5f5f5;'>Teste</div>", 'html'))
     msg.attach(MIMEText(html, 'html'))
 
-    # Configurar cabeçalhos
     msg['Subject'] = assunto
     msg['From'] = "cobranca@evopass.app.br"
     msg['To'] = para
 
-    # Conectar e enviar e-mail usando SMTP_SSL
-    with smtplib.SMTP_SSL('smtp.sendgrid.net', 465) as smtp:
-        smtp.login(Username, Password)
+    with smtplib.SMTP('smtp.sendgrid.net', 587) as smtp:
+        smtp.starttls()
+        smtp.login(username, password)
         smtp.send_message(msg)
-
-# send_email('Testando envio de html', 'felipe@evopass.app.br')
-# send_email('Faturamento Evopass', 'felipe@evopass.app.br', render_html('Felipe SA', '12/2023', '20,89', 'https://www.evopass.app.br', '9238409'))
-# send_email('Faturamento Evopass', 'felipemelo.unidade@gmail.com', myMail)
