@@ -20,7 +20,7 @@ Desenvolvimento:
    export MY_AMBIENT_VAR='dev'; python coletadedados.py
 ```
 
-Produção:
+Produção:-
 ```bash
    export MY_AMBIENT_VAR='prod'; python coletadedados.py
 ```
