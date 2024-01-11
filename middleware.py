@@ -1,3 +1,4 @@
+from flask import g
 from termcolor import colored
 
 from environment.environmentAccess import getEnvironmentVar
@@ -6,6 +7,7 @@ from baseURL.getBaseURL import getBaseURL
 from functions.getCustomersList import getCustomersList
 from functions.generateBiling import generateBiling
 from functions.issueNf import generateIssueNf
+from functions.generateExtract import generateExtractRequest
 
 def configEnvironmentVars () :
 
@@ -28,10 +30,10 @@ def configEnvironmentVars () :
     return configVars
 
 def runGetCustomersList () :
-    return getCustomersList(configEnvironmentVars()['baseURL'], configEnvironmentVars()['token'])
+    return getCustomersList(configEnvironmentVars()['baseURL']['asaas'], configEnvironmentVars()['token'])
 
 def runGenerateBiling (invoiceData) :
-    return generateBiling(configEnvironmentVars()['baseURL'], configEnvironmentVars()['token'], invoiceData)
+    return generateBiling(configEnvironmentVars()['baseURL']['asaas'], configEnvironmentVars()['token'], invoiceData)
 
 def runGenerateIssueNf (payment, value, effectiveDate) :
 
@@ -47,4 +49,7 @@ def runGenerateIssueNf (payment, value, effectiveDate) :
 
     else :
         
-        return generateIssueNf(configEnvironmentVars()['baseURL'], configEnvironmentVars()['token'], payment, value, effectiveDate)
+        return generateIssueNf(configEnvironmentVars()['baseURL']['asaas'], configEnvironmentVars()['token'], payment, value, effectiveDate)
+    
+def runGenerateExtractRequest (competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
+    return generateExtractRequest(configEnvironmentVars()['baseURL']['evopass'], competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj)

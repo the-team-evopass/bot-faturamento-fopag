@@ -2,8 +2,9 @@ from xmlrpc.client import ResponseError
 import requests
 import json
 
-def generateExtractRequest(competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
-    url = f"https://us-central1-api-evoppass-dev.cloudfunctions.net/v1/generate_pdf/?id={idCompany}"
+def generateExtractRequest(baseURL, competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
+
+    url = f"{baseURL}/generate_pdf/?id={idCompany}"
 
     payload = json.dumps({
         "competence": competence,

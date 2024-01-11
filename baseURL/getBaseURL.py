@@ -1,9 +1,22 @@
 def getBaseURL(myAmbient):
+
     ambient = myAmbient
     
     if ambient == 'prod':
-        return 'https://api.asaas.com'
+        return {
+            'asaas': 'https://api.asaas.com',
+            'evopass': 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1'
+        }
     elif ambient == 'dev':
-        return 'https://sandbox.asaas.com/api'
+
+        return {
+            'asaas': 'https://sandbox.asaas.com/api',
+            'evopass': 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1'
+        } 
+    
     else:
-        return 'https://api.asaas.com'
+        
+        return {
+            'asaas': 'https://sandbox.asaas.com/api',
+            'evopass': 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1'
+        }

@@ -4,8 +4,8 @@ from calculoprorata import calcular_prorata
 from datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
 from functions.criarCobranca import criar_cobranca
-from functions.generateExtract import generateExtractRequest
 from middleware import runGenerateIssueNf
+from middleware import runGenerateExtractRequest
 from functions.render import render_html
 from functions.sendemail import send_email
 
@@ -27,7 +27,7 @@ dados_extrato = []
 dados_relatorio = []
 
 #Substituir por datetime.now() e extrair o dia
-dia_emissao = 27
+dia_emissao = 10
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -54,7 +54,7 @@ if respostaAllCompany.status_code == 200:
         dados_relatorio = []
 
         # if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
-        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
+        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and (empresa_id != 204 and empresa_id != 114 and empresa_id != 184 and empresa_id != 144 and empresa_id != 124):
             contagem_value_titular = 0
             contagem_value_dependente = 0
 
@@ -243,11 +243,10 @@ if respostaAllCompany.status_code == 200:
                 runGenerateIssueNf(billingResponse['billingID'], valor_boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
 
                 #Estou gerando o PDF aqui
-                generateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
+                runGenerateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
                 
-                myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
-
-                send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
+                # myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
+                # send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
 
                 print(colored('-------------------------------------------------------------------------------', 'yellow', 'on_green', ['underline']))
 
