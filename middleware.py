@@ -1,4 +1,3 @@
-from flask import g
 from termcolor import colored
 
 from environment.environmentAccess import getEnvironmentVar

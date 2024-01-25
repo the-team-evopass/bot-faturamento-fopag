@@ -27,7 +27,7 @@ dados_extrato = []
 dados_relatorio = []
 
 #Substituir por datetime.now() e extrair o dia
-dia_emissao = 10
+dia_emissao = 25
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
@@ -49,7 +49,10 @@ if respostaAllCompany.status_code == 200:
         empresa_tradeName = empresa['tradeName']  # Nome da empresa
         empresa_companyStatus = empresa['companyStatus']  # Status da empresa
         empresa_cutoffDate = empresa['cutoffDate']  # Data corte
-        empresa_value = empresa['companyAgreements'][-1]['value']  # Valor que a empresa paga se ela tem apenas um contrato
+        try: 
+            empresa_value = empresa['companyAgreements'][-1]['value']  # Valor que a empresa paga se ela tem apenas um contrato
+        except:
+            print("Erro ao buscar dados da empresa com id ", empresa_id)
         dados_extrato = []
         dados_relatorio = []
 
@@ -112,7 +115,7 @@ if respostaAllCompany.status_code == 200:
                         entrada_aluno_date = entrada_titular.date() #Entrada de aluno em Data 05/12/2023
                         contador_titulares_empresa += 1
                         soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
-
+                        print(titular_status, titular_studentAgreement_value)
                         if emissao_menos_mes < entrada_aluno_date:
                             valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
                             valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
