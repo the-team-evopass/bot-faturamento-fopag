@@ -27,7 +27,7 @@ dados_extrato = []
 dados_relatorio = []
 
 #Substituir por datetime.now() e extrair o dia
-dia_emissao = 25
+dia_emissao = 27
 data_atual = datetime.now()
 
 if respostaAllCompany.status_code == 200:
