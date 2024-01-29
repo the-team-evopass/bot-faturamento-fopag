@@ -1,12 +1,18 @@
+from webbrowser import get
 from termcolor import colored
 
 from environment.environmentAccess import getEnvironmentVar
-from baseURL.getBaseURL import getBaseURL
+from services.baseURL.getBaseURL import getBaseURL
 
 from functions.getCustomersList import getCustomersList
 from functions.generateBiling import generateBiling
 from functions.issueNf import generateIssueNf
 from functions.generateExtract import generateExtractRequest
+
+
+# services
+from services.getlAllEconomicGroups.getlAllEconomicGroups import getlAllEconomicGroups
+from services.getAllCompanies.getAllCompanies import getAllCompanies
 
 def configEnvironmentVars () :
 
@@ -52,3 +58,9 @@ def runGenerateIssueNf (payment, value, effectiveDate) :
     
 def runGenerateExtractRequest (competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
     return generateExtractRequest(configEnvironmentVars()['baseURL']['evopass'], competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj)
+
+def runGetlAllEconomicGroups ():
+    return getlAllEconomicGroups(configEnvironmentVars()['baseURL']['evopass'])
+
+def runGetAllCompanies ():
+    return getAllCompanies(configEnvironmentVars()['baseURL']['evopass'])

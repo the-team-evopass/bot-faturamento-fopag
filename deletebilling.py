@@ -31,5 +31,3 @@ if listaCobranca != []:
 
 else:
     print("Sem cobranças no Asaas Sandbox")
-
-

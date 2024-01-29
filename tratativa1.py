@@ -10,18 +10,19 @@ from middleware import runGenerateExtractRequest
 from functions.render import render_html
 from functions.sendemail import send_email
 
+from middleware import runGetlAllEconomicGroups
+from middleware import runGetAllCompanies
+
 def Tratativa(dia_emissao, data_atual):
     # URLs DAS APIs
-    urlAllEconomicGroup = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/economic_group/company'
-    urlAllCompany = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements%2Cstudents'
-    urlAllStudent = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress%2Ccompany'
-    urlAllDependent = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/dependent?expand=student%2CdependentContact%2CdependentAgreement%2CdependentAddress'
+    urlAllStudents = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress%2Ccompany'
+    urlAllDependents = 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1/dependent?expand=student%2CdependentContact%2CdependentAgreement%2CdependentAddress'
 
     # Listagem de Empresas e a data corte
-    respostaAllEconomicGroup = requests.get(urlAllEconomicGroup)
-    respostaAllCompany = requests.get(urlAllCompany)
-    respostaAllStudents = requests.get(urlAllStudent)
-    respostaAllDependent = requests.get(urlAllDependent)
+    # respostaAllEconomicGroup = runGetlAllEconomicGroups()
+    respostaAllCompany = runGetAllCompanies()
+    respostaAllStudents = requests.get(urlAllStudents)
+    respostaAllDependent = requests.get(urlAllDependents)
 
     # Dados Extrato
     cabecalhos_extrato = ["Nome do Aluno", "Parentesco", "CPF", "Pró rata", "Valor", "Valor Total"] # Cabeçalhos das colunas
@@ -29,75 +30,72 @@ def Tratativa(dia_emissao, data_atual):
 
     dados_extrato = []
     dados_relatorio = []
+    listaEmpresas = respostaAllCompany['data']
 
-    if respostaAllCompany.status_code == 200:
-        listaGrupoEconomico = respostaAllEconomicGroup.json()
+    listaTitulares = respostaAllStudents.json()
+    listaDependentes = respostaAllDependent.json()
 
-        companyJson = respostaAllCompany.json()
-        listaEmpresas = companyJson['data']
+    # Contador de empresas
+    contador_empresas = 0
 
-        listaTitulares = respostaAllStudents.json()
-        listaDependentes = respostaAllDependent.json()
+    for empresa in listaEmpresas:
+        empresa_id = empresa['id']
+        empresa_cnpj = empresa['cnpj']  # Cnpj da empresa
+        empresa_tradeName = empresa['tradeName']  # Nome da empresa
+        empresa_companyStatus = empresa['companyStatus']  # Status da empresa
+        empresa_cutoffDate = empresa['cutoffDate']  # Data corte
+        empresa_student = empresa['students']
+        empresa_group_name = empresa['name']
+        print(empresa['companyAgreements'])
+        try: 
+            empresa_value = empresa['companyAgreements'][-1]['value']  # Valor que a empresa paga se ela tem apenas um contrato
+        except:
+            print("Erro ao buscar dados da empresa com id ", empresa_id)
+        dados_extrato = []
+        dados_relatorio = []
 
-        # Contador de empresas
-        contador_empresas = 0
+        # if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
+        if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
+            contagem_value_titular = 0
+            contagem_value_dependente = 0
 
-        for empresa in listaEmpresas:
-            empresa_id = empresa['id']
-            empresa_cnpj = empresa['cnpj']  # Cnpj da empresa
-            empresa_tradeName = empresa['tradeName']  # Nome da empresa
-            empresa_companyStatus = empresa['companyStatus']  # Status da empresa
-            empresa_cutoffDate = empresa['cutoffDate']  # Data corte
-            empresa_student = empresa['students']
-            empresa_group_name = empresa['name']
-            try: 
-                empresa_value = empresa['companyAgreements'][-1]['value']  # Valor que a empresa paga se ela tem apenas um contrato
-            except:
-                print("Erro ao buscar dados da empresa com id ", empresa_id)
-            dados_extrato = []
-            dados_relatorio = []
+            # Contador de titulares
+            contador_titulares_empresa = 0
+            contador_empresas += 1
+            contador_titulares_prorata = 0
 
-            # if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
-            if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and (empresa_id != 204 and empresa_id != 114 and empresa_id != 184 and empresa_id != 144 and empresa_id != 124):
-                contagem_value_titular = 0
-                contagem_value_dependente = 0
+            soma_valor_titulares_prorata = 0
+            soma_valor_dependentes_prorata = 0
+            soma_valor_mensalidade_titulares = 0
+            soma_valor_mensalidade_dependentes = 0
 
-                # Contador de titulares
-                contador_titulares_empresa = 0
-                contador_empresas += 1
-                contador_titulares_prorata = 0
+            contador_dependentes_empresa_temp = 0
 
-                soma_valor_titulares_prorata = 0
-                soma_valor_dependentes_prorata = 0
-                soma_valor_mensalidade_titulares = 0
-                soma_valor_mensalidade_dependentes = 0
+            # Filtro das empresas que têm a data de corte igual ao dia atual
+            print(colored(f"Faturamento da empresa {empresa_tradeName}.", 'blue'))
 
-                contador_dependentes_empresa_temp = 0
+            # Tratamento de dados das datas de emissão de boleto e data start do aluno
+            data_atual = datetime.now()
+            data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate)  # Data Emissão do Boleto | 2023-10-30
+            data_emissao_date = data_emissao.date()  # Emissão em Data 02/10/2023
 
-                # Filtro das empresas que têm a data de corte igual ao dia atual
-                print(colored(f"Faturamento da empresa {empresa_tradeName}.", 'blue'))
+            # Tratamento de dados dos valores
+            
+            data_corte = empresa_cutoffDate  # Data Corte
+            emissao_menos_mes = data_emissao_date - timedelta(days=30)  # Emissão de boleto - 30 dias
 
-                # Tratamento de dados das datas de emissão de boleto e data start do aluno
-                data_atual = datetime.now()
-                data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate)  # Data Emissão do Boleto | 2023-10-30
-                data_emissao_date = data_emissao.date()  # Emissão em Data 02/10/2023
+            dias_adicionais = 10
 
-                # Tratamento de dados dos valores
-                
-                data_corte = empresa_cutoffDate  # Data Corte
-                emissao_menos_mes = data_emissao_date - timedelta(days=30)  # Emissão de boleto - 30 dias
+            # Data de vencimento da cobrança
+            data_vencimento = calcular_data_vencimento(empresa_cutoffDate, dias_adicionais)
 
-                dias_adicionais = 10
+            competencia_mes_ano = data_emissao_date.strftime('%B de %Y')
 
-                # Data de vencimento da cobrança
-                data_vencimento = calcular_data_vencimento(empresa_cutoffDate, dias_adicionais)
+            contador_dependentes_prorata = 0
+            contador_dependentes_empresa = 0
 
-                competencia_mes_ano = data_emissao_date.strftime('%B de %Y')
-
-                contador_dependentes_prorata = 0
-                contador_dependentes_empresa = 0
-
-                # Loop para coletar dados dos Titulares
+            # Loop para coletar dados dos Titulares
+            if empresa_student != []:
                 for titular in listaTitulares:
                     titular_firstName = titular['firstName']
                     titular_status = titular['status']
@@ -203,77 +201,58 @@ def Tratativa(dia_emissao, data_atual):
 
                                         contagem_value_dependente += float(valor_mensal_dependente)
 
-                dados_relatorio.append({
-                    "reference": "Pro rata - Titulares",
-                    "quantity": float(contador_titulares_prorata),
-                    "value": float(soma_valor_titulares_prorata)
-                })
-                dados_relatorio.append({
-                    "reference": "Mensalidade  - Titulares",
-                    "quantity": float(contador_titulares_empresa),
-                    "value": float(soma_valor_mensalidade_titulares)
-                })
-                dados_relatorio.append({
-                    "reference": "Pro rata - Dependentes",
-                    "quantity": float(contador_dependentes_prorata),
-                    "value": float(soma_valor_dependentes_prorata)
-                })
-                dados_relatorio.append({
-                    "reference": "Mensalidade - Dependentes",
-                    "quantity": float(contador_dependentes_empresa),
-                    "value": float(soma_valor_mensalidade_dependentes)
-                })
+            dados_relatorio.append({
+                "reference": "Pro rata - Titulares",
+                "quantity": float(contador_titulares_prorata),
+                "value": float(soma_valor_titulares_prorata)
+            })
+            dados_relatorio.append({
+                "reference": "Mensalidade  - Titulares",
+                "quantity": float(contador_titulares_empresa),
+                "value": float(soma_valor_mensalidade_titulares)
+            })
+            dados_relatorio.append({
+                "reference": "Pro rata - Dependentes",
+                "quantity": float(contador_dependentes_prorata),
+                "value": float(soma_valor_dependentes_prorata)
+            })
+            dados_relatorio.append({
+                "reference": "Mensalidade - Dependentes",
+                "quantity": float(contador_dependentes_empresa),
+                "value": float(soma_valor_mensalidade_dependentes)
+            })
 
-                valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
-                valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
+            valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
+            valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
 
+            if valor_boleto_empresa != 0:
+
+                billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
                 
+                print(colored(billingResponse['billingURL'], 'green'))
 
-                #Definir Grupo economico
-                for grupo in listaGrupoEconomico:
-                    grupo_billingType = grupo['billingType']
-                    grupo_cnpj = grupo['cnpj']
-                    grupo_name = grupo['name']
+                extractObservation = '''
+                    Prezado(a) cliente,
+                    Para visualizar e efetuar o pagamento do boleto, acesse o link fornecido.
+                    Qualquer problema ou dificuldade, entre em contato conosco.
+                    Agradecemos pela sua atenção.
+                '''
 
-                    print(colored(f"Competência: {competencia_mes_ano}", 'blue'))
-                    print(colored(f"Data de Vencimento: {data_vencimento}", 'blue'))
+                # Função para emissão de NF
+                runGenerateIssueNf(billingResponse['billingID'], valor_boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
 
-                    if empresa_group_name == grupo_name and grupo_billingType == "UNIFICADO" :
-                        print('Somar o valor dos boletos das empresas e criar a cobrança no cnpj do grupo economico')
-                                
-                    elif empresa_group_name == grupo_name and grupo_billingType == "APARTADO":
-                        print('Criar cobrança no nome de cada empresa')
+                #Estou gerando o PDF aqui
+                runGenerateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
+                
+                # myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
+                # send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
 
-                    if valor_boleto_empresa != 0 and empresa_student != []:
+                print(colored('-------------------------------------------------------------------------------', 'yellow', 'on_green', ['underline']))
 
-                        billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
-                        
-                        print(colored(billingResponse['billingURL'], 'green'))
+            else:
+                print('Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados) ou empresa não tem titulares')
+                print('-------------------------------------------------------------------------------')
 
-                        extractObservation = '''
-                            Prezado(a) cliente,
-                            Para visualizar e efetuar o pagamento do boleto, acesse o link fornecido.
-                            Qualquer problema ou dificuldade, entre em contato conosco.
-                            Agradecemos pela sua atenção.
-                        '''
-
-                        # Função para emissão de NF
-                        runGenerateIssueNf(billingResponse['billingID'], valor_boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
-
-                        #Estou gerando o PDF aqui
-                        runGenerateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
-                        
-                        # myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
-                        # send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
-
-                        print(colored('-------------------------------------------------------------------------------', 'yellow', 'on_green', ['underline']))
-
-                    else:
-                        print('Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados) ou empresa não tem titulares')
-                        print('-------------------------------------------------------------------------------')
-
-        else:
-            print('Não entrou no if - seleção de empresas (coletadedados)')            
-                    
     else:
-        print(f"Erro na requisição. Código de Status: {respostaAllCompany.status_code}{' (coletadedados)'}")
+        print('Não entrou no if - seleção de empresas (coletadedados)')            
+                

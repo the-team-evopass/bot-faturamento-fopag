@@ -1,0 +1,14 @@
+#Definir Grupo economico
+for grupo in listaGrupoEconomico:
+    grupo_billingType = grupo['billingType']
+    grupo_cnpj = grupo['cnpj']
+    grupo_name = grupo['name']
+
+    print(colored(f"Competência: {competencia_mes_ano}", 'blue'))
+    print(colored(f"Data de Vencimento: {data_vencimento}", 'blue'))
+
+    if empresa_group_name == grupo_name and grupo_billingType == "UNIFICADO" :
+        print('Somar o valor dos boletos das empresas e criar a cobrança no cnpj do grupo economico')
+                
+    elif empresa_group_name == grupo_name and grupo_billingType == "APARTADO":
+        print('Criar cobrança no nome de cada empresa')

@@ -11,7 +11,7 @@ def getBaseURL(myAmbient):
 
         return {
             'asaas': 'https://sandbox.asaas.com/api',
-            'evopass': 'https://us-central1-api-evoppass-dev.cloudfunctions.net/v1'
+            'evopass': 'https://us-central1-api-evopass-d943e.cloudfunctions.net/v1'
         } 
     
     else:
