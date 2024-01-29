@@ -26,10 +26,6 @@ cabecalhos_relatorio = ["Referência", "Quantidade", "Valor"]# Cabeçalhos das c
 dados_extrato = []
 dados_relatorio = []
 
-#Substituir por datetime.now() e extrair o dia
-dia_emissao = 25
-data_atual = datetime.now()
-
 if respostaAllCompany.status_code == 200:
     companyJson = respostaAllCompany.json()
     listaEmpresas = companyJson['data']
@@ -47,6 +43,7 @@ if respostaAllCompany.status_code == 200:
         empresa_id = empresa['id']
         empresa_cnpj = empresa['cnpj']  # Cnpj da empresa
         empresa_tradeName = empresa['tradeName']  # Nome da empresa
+        empresa_student = empresa['students']
         empresa_companyStatus = empresa['companyStatus']  # Status da empresa
         empresa_cutoffDate = empresa['cutoffDate']  # Data corte
         try: 
@@ -55,6 +52,10 @@ if respostaAllCompany.status_code == 200:
             print("Erro ao buscar dados da empresa com id ", empresa_id)
         dados_extrato = []
         dados_relatorio = []
+        
+        #Substituir por datetime.now() e extrair o dia
+        dia_emissao = 25
+        data_atual = datetime.now()
 
         # if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':
         if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and (empresa_id != 204 and empresa_id != 114 and empresa_id != 184 and empresa_id != 144 and empresa_id != 124):
@@ -115,7 +116,7 @@ if respostaAllCompany.status_code == 200:
                         entrada_aluno_date = entrada_titular.date() #Entrada de aluno em Data 05/12/2023
                         contador_titulares_empresa += 1
                         soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
-                        print(titular_status, titular_studentAgreement_value)
+                        # print(titular_status, titular_studentAgreement_value)
                         if emissao_menos_mes < entrada_aluno_date:
                             valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
                             valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
@@ -229,7 +230,7 @@ if respostaAllCompany.status_code == 200:
             print(colored(f"Competência: {competencia_mes_ano}", 'blue'))
             print(colored(f"Data de Vencimento: {data_vencimento}", 'blue'))
 
-            if valor_boleto_empresa != 0:
+            if valor_boleto_empresa != 0 and empresa_student != []:
 
                 billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
                 
@@ -254,9 +255,9 @@ if respostaAllCompany.status_code == 200:
                 print(colored('-------------------------------------------------------------------------------', 'yellow', 'on_green', ['underline']))
 
             else:
-                print('Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados)')
+                print(f'Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados) ou A empresa {empresa_tradeName} não tem titulares cadastrados')
                 print('-------------------------------------------------------------------------------')
-  
+
     else:
         print('Não entrou no if - seleção de empresas (coletadedados)')            
                 
