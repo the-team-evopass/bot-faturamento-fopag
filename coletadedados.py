@@ -54,7 +54,7 @@ if respostaAllCompany.status_code == 200:
         dados_relatorio = []
         
         #Substituir por datetime.now() e extrair o dia
-        dia_emissao = 25
+        dia_emissao = 2
         data_atual = datetime.now()
 
         # if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_tradeName == 'NEW LIMP PRODUTOS PARA LIMPEZA LTDA':

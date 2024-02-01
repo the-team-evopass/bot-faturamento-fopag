@@ -46,7 +46,7 @@ def Tratativa(dia_emissao, data_atual):
         empresa_cutoffDate = empresa['cutoffDate']  # Data corte
         empresa_student = empresa['students']
         empresa_group_name = empresa['name']
-        print(empresa['companyAgreements'])
+        # print(empresa['companyAgreements'])
         try: 
             empresa_value = empresa['companyAgreements'][-1]['value']  # Valor que a empresa paga se ela tem apenas um contrato
         except:
@@ -108,13 +108,13 @@ def Tratativa(dia_emissao, data_atual):
 
                     valor_por_dia = float(titular_studentAgreement_value) / float(30.0)  # valor cobrado por dia
                         
-                    if titular_status == True and titular_studentAgreement_type == "F":
+                    if titular_status == True and titular_studentAgreement_type == "FOLHA DE PAGAMENTO":
                         if titular_companyCNPJ == empresa_cnpj:
                             entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%dT%H:%M:%S.%fZ') #Data que o aluno iniciou na empresa | 2023-12-05
                             entrada_aluno_date = entrada_titular.date() #Entrada de aluno em Data 05/12/2023
                             contador_titulares_empresa += 1
                             soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
-                            print(titular_status, titular_studentAgreement_value)
+                            # print(titular_status, titular_studentAgreement_value)
                             if emissao_menos_mes < entrada_aluno_date:
                                 valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
                                 valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
@@ -160,7 +160,7 @@ def Tratativa(dia_emissao, data_atual):
 
                                 valor_por_dia = float(dependente_studentAgreement_value) / float(30.0)  # valor cobrado por dia
 
-                                if dependente_status == True and dependente_studentAgreement_type == "F":
+                                if dependente_status == True and dependente_studentAgreement_type == "FOLHA DE PAGAMENTO":
                                     if dependente_student_cpf == titular_cpf:
                                         contador_dependentes_empresa += 1
                                         soma_valor_mensalidade_dependentes += float(dependente_studentAgreement_value)
