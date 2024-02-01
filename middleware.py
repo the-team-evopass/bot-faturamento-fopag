@@ -11,8 +11,9 @@ from functions.generateExtract import generateExtractRequest
 
 
 # services
-from services.getlAllEconomicGroups.getlAllEconomicGroups import getlAllEconomicGroups
 from services.getAllCompanies.getAllCompanies import getAllCompanies
+from services.getAllDependents.getAllDependents import getAllDependents
+from services.getAllHolders.getAllHolders import getAllHolders
 
 def configEnvironmentVars () :
 
@@ -59,8 +60,11 @@ def runGenerateIssueNf (payment, value, effectiveDate) :
 def runGenerateExtractRequest (competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
     return generateExtractRequest(configEnvironmentVars()['baseURL']['evopass'], competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj)
 
-def runGetlAllEconomicGroups ():
-    return getlAllEconomicGroups(configEnvironmentVars()['baseURL']['evopass'])
-
 def runGetAllCompanies ():
     return getAllCompanies(configEnvironmentVars()['baseURL']['evopass'])
+
+def runGetAllHolders ():
+    return getAllHolders(configEnvironmentVars()['baseURL']['evopass'])
+
+def runGetAllDependents ():
+    return getAllDependents(configEnvironmentVars()['baseURL']['evopass'])
