@@ -1,5 +1,7 @@
+
+from datetime import datetime
 from flask import Flask
-import functions.criarcobranca as criarcobranca
+from main import FaturarEmpresas
 
 app = Flask(__name__)
 
@@ -10,7 +12,10 @@ def home():
 
 @app.get('/run')
 def executar_bot():
-    criarcobranca
+    dia_emissao = data_atual
+    data_atual = datetime.now()
+    FaturarEmpresas(dia_emissao, data_atual)
+    
     return "Executando Bot de Faturamento EVOPASS"
 
 

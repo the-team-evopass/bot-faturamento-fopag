@@ -4,10 +4,10 @@ from termcolor import colored
 from environment.environmentAccess import getEnvironmentVar
 from services.baseURL.getBaseURL import getBaseURL
 
-from functions.getCustomersList import getCustomersList
-from functions.generateBiling import generateBiling
+from functions.asaas.getCustomersList import getCustomersList
+from functions.asaas.generateBiling import generateBiling
 from functions.issueNf import generateIssueNf
-from functions.generateExtract import generateExtractRequest
+from functions.asaas.generateExtract import generateExtractRequest
 
 
 # services
