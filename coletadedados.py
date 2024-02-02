@@ -137,19 +137,21 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                 contador_dependentes_prorata += 1
                                                 valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
                                                 valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
-
-                                                dados_extrato.append({
+                                                try:
+                                                    dados_extrato.append({
                                                         "name": dependente_firstName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": float(valor_calculo_prorata),
                                                         "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)
                                                     })
+                                                except:
+                                                    print(dependente_firstName)
 
                                             else:
                                                 valor_mensal_dependente = dependente_studentAgreement_value
                                                 
                                                 dados_extrato.append({
-                                                        "name": dependente_firstName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": 0,
-                                                        "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)
-                                                    })
+                                                    "name": dependente_firstName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": 0,
+                                                    "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)
+                                                })
 
                                             contagem_value_dependente += float(valor_mensal_dependente)
 
@@ -165,6 +167,9 @@ def FaturarEmpresas(dia_emissao, data_atual):
                 dados_relatorio.append({
                     "reference": "Mensalidade - Dependentes", "quantity": float(contador_dependentes_empresa),"value": float(soma_valor_mensalidade_dependentes)
                 })
+
+
+
 
                 valor_boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
                 valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
@@ -197,7 +202,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                     print('Erro ao gerar cobrança, valor do boleto igual a 0 (coletadedados) ou empresa não tem titulares')
                     print('-------------------------------------------------------------------------------')
         else:
-            print(f"A empresa {empresa_tradeName} não foi faturada")
+            print(colored(f"A empresa {empresa_tradeName} não foi faturada", 'red'))
     else:
         print('Não entrou no if - seleção de empresas (coletadedados)')            
                 
