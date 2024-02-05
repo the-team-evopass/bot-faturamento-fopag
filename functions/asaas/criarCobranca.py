@@ -7,7 +7,6 @@ from functions.searchCustumer import findIdCustumerByCNPJ
 def criar_cobranca(empresa_cnpj, valor_total_empresa, data_vencimento):
 
     try:
-
         listCustumers = runGetCustomersList()
         resultOffFindIdCustumerByCNPJ = findIdCustumerByCNPJ(listCustumers, empresa_cnpj)
 

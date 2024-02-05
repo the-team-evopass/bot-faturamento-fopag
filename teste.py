@@ -26,11 +26,17 @@ def FaturarEmpresasTeste(dia_emissao, data_atual):
     # Grupos Economicos
     for grupo in listaGruposEconomicos:
         valor_boleto_grupo = 0
+        contador_empresas_grupo = 0
+
         grupo_cnpj = grupo['cnpj']
         grupo_name = grupo['name']
         grupo_billingType = grupo['billingType']
         grupo_companies = grupo['companies']
-        print(colored(f"Faturamento do grupo {grupo_name} - {grupo_billingType}.", 'yellow'))
+
+        qnt_empresas = len(grupo_companies)
+
+        print(colored(f"Faturamento do grupo {grupo_name} - {grupo_billingType} - {qnt_empresas} empresas.", 'red'))
+
         for empresa in grupo_companies:
             cnpj_empresa_grupo = empresa['cnpj']
             tradeName_empresa_grupo = empresa['tradeName']
@@ -52,6 +58,8 @@ def FaturarEmpresasTeste(dia_emissao, data_atual):
 
                     if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
                         contagem_value_titular, contagem_value_dependente = 0, 0
+
+                        contador_empresas_grupo += 1
 
                         # Contador de titulares
                         contador_titulares_empresa = 0
@@ -187,14 +195,15 @@ def FaturarEmpresasTeste(dia_emissao, data_atual):
 
                         if grupo_billingType == 'APARTADO':
                             print(valor_boleto_empresa)
-                            # FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento)
+                            FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento)
 
                         elif grupo_billingType == 'UNIFICADO':
                             valor_boleto_grupo += (valor_boleto_empresa)
+                            print(valor_boleto_grupo)
 
-                            print(valor_boleto_empresa)
-                            # FaturarGrupo(valor_boleto_grupo, cnpj_empresa_grupo, data_vencimento)
-                            print(f'O valor do boleto do grupo unificado é de { valor_boleto_grupo}')
+                            if qnt_empresas == contador_empresas_grupo:
+                                print(f'O valor do boleto do grupo unificado é de { valor_boleto_grupo}')
+                                FaturarGrupo(valor_boleto_grupo, cnpj_empresa_grupo, data_vencimento)
  
                     
 def FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento):
