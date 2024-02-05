@@ -13,6 +13,7 @@ from functions.asaas.generateExtract import generateExtractRequest
 # services
 from services.getAllCompanies.getAllCompanies import getAllCompanies
 from services.getAllDependents.getAllDependents import getAllDependents
+from services.getAllEconomicsGroups.getAllEconomicsGroups import getAllEconomicsGroups
 from services.getAllHolders.getAllHolders import getAllHolders
 
 def configEnvironmentVars () :
@@ -59,6 +60,9 @@ def runGenerateIssueNf (payment, value, effectiveDate) :
     
 def runGenerateExtractRequest (competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
     return generateExtractRequest(configEnvironmentVars()['baseURL']['evopass'], competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj)
+
+def runGetAllEconomicsGroups ():
+    return getAllEconomicsGroups(configEnvironmentVars()['baseURL']['evopass'])
 
 def runGetAllCompanies ():
     return getAllCompanies(configEnvironmentVars()['baseURL']['evopass'])

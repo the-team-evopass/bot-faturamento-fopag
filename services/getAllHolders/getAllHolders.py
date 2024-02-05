@@ -11,6 +11,6 @@ def getAllHolders (baseURL):
     response = requests.request('GET', url, headers=headers, data=payload)
 
     if response.status_code != 200:
-        print('Erro ao pegar lista de empresas ' + str(response.status_code) + ' || ' + response.text + ' (getAllHolders)')
+        print('Erro ao pegar lista de titulares ' + str(response.status_code) + ' || ' + response.text + ' (getAllHolders)')
 
     return response.json()

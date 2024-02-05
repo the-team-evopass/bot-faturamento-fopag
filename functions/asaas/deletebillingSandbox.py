@@ -33,6 +33,7 @@ def ListAndDeleteBilling():
         if response_list.status_code == 200:
             data = response_list.json()['data']
             if not data:
+                print('Sem cobranças no Asaas Sandbox')
                 break
             for cobranca in data:
                 id_cobranca = cobranca['id']
