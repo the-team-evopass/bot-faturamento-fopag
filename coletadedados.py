@@ -56,6 +56,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                 if empresa_cnpj in cnpj_empresa_grupo:
                     if empresa_cnpj == grupo_cnpj:
                         id_temp = empresa_id
+                        name_temp = empresa_tradeName
 
                     if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
                         contagem_value_titular, contagem_value_dependente = 0, 0
@@ -93,6 +94,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         if empresa_student != []:
                             for titular in listaTitulares:
                                 titular_firstName = titular['firstName']
+                                titular_lastName = titular['lastName']
                                 titular_status = titular['status']
                                 titular_startValidity = titular['startValidity']
                                 titular_cpf = titular['cpf']
@@ -119,14 +121,14 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                             print(soma_valor_titulares_prorata)
                                             
                                             dados_extrato.append({
-                                                    "name": titular_firstName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": float(valor_calculo_prorata),
+                                                    "name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": float(valor_calculo_prorata),
                                                     "value":  float(titular_studentAgreement_value),"totalValue": float(valor_mensal_titular)
                                                 })
 
                                         else:
                                             valor_mensal_titular = titular_studentAgreement_value
                                             dados_extrato.append({
-                                                    "name": titular_firstName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": 0,
+                                                    "name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": 0,
                                                     "value":  float(titular_studentAgreement_value),"totalValue": float(valor_mensal_titular)
                                                 })
 
@@ -135,6 +137,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                         # Loop para coletar dados dos Dependentes dos titulares
                                         for dependente in listaDependentes:
                                             dependente_firstName = dependente['firstName']
+                                            dependente_lastName = dependente['lastName']
                                             dependente_status = dependente['status']
                                             dependente_startValidity = dependente['startValidity']
                                             dependente_cpf = dependente['cpf']
@@ -160,7 +163,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                         valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
                                                         try:
                                                             dados_extrato.append({
-                                                                "name": dependente_firstName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": float(valor_calculo_prorata),
+                                                                "name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": float(valor_calculo_prorata),
                                                                 "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)
                                                             })
                                                         except:
@@ -170,7 +173,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                         valor_mensal_dependente = dependente_studentAgreement_value
                                                         
                                                         dados_extrato.append({
-                                                            "name": dependente_firstName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": 0,
+                                                            "name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": 0,
                                                             "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)
                                                         })
 
@@ -206,5 +209,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
                             if qnt_empresas == contador_empresas_grupo:
                                 print(f'valor do boleto do grupo unificado: { valor_boleto_grupo}\n')
                                 print(f"O id do boleto é {id_temp}")
-                                GenerateInvoicing(valor_boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,empresa_tradeName)
+                                print(f"O nome do boleto é {name_temp}")
+                                GenerateInvoicing(valor_boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
            
