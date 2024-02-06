@@ -1,5 +1,4 @@
 from termcolor import colored
-
 from middleware import runGetCustomersList
 from middleware import runGenerateBiling
 from functions.searchCustumer import findIdCustumerByCNPJ

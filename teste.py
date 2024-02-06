@@ -28,7 +28,6 @@ def FaturarEmpresasTeste(dia_emissao, data_atual):
         valor_boleto_grupo = 0
         contador_empresas_grupo = 0
 
-        grupo_cnpj = grupo['cnpj']
         grupo_name = grupo['name']
         grupo_billingType = grupo['billingType']
         grupo_companies = grupo['companies']
@@ -195,18 +194,19 @@ def FaturarEmpresasTeste(dia_emissao, data_atual):
 
                         if grupo_billingType == 'APARTADO':
                             print(valor_boleto_empresa)
-                            FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento)
+                            FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
                         elif grupo_billingType == 'UNIFICADO':
+                            print(valor_boleto_empresa)
                             valor_boleto_grupo += (valor_boleto_empresa)
                             print(valor_boleto_grupo)
 
                             if qnt_empresas == contador_empresas_grupo:
                                 print(f'O valor do boleto do grupo unificado é de { valor_boleto_grupo}')
-                                FaturarGrupo(valor_boleto_grupo, cnpj_empresa_grupo, data_vencimento)
+                                FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
  
                     
-def FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento):
+def FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName):
     if valor_boleto_empresa != 0:
         billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
         
@@ -223,7 +223,7 @@ def FaturarGrupo(valor_boleto_empresa, empresa_cnpj, data_vencimento):
         runGenerateIssueNf(billingResponse['billingID'], valor_boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
 
         #Estou gerando o PDF aqui
-        # runGenerateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
+        runGenerateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
         
         # myContentEmail = render_html(empresa_tradeName, competencia_mes_ano, str(valor_soma_total), billingResponse['billingURL'], 'inv_000006811891')
         # send_email('Teste do bot de faturamento', 'felipe@evopass.app.br', myContentEmail)
