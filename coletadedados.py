@@ -34,8 +34,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
 
         qnt_empresas = len(grupo_companies)
 
-        # print(colored(f"Faturamento do grupo {grupo_name} - {grupo_billingType} - {qnt_empresas} empresas.", 'cyan'))
-
         for empresa in grupo_companies:
             cnpj_empresa_grupo = empresa['cnpj']
             tradeName_empresa_grupo = empresa['tradeName']
@@ -54,6 +52,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                 dados_relatorio = []
 
                 if empresa_cnpj in cnpj_empresa_grupo:
+                    
                     if empresa_cnpj == grupo_cnpj:
                         id_temp = empresa_id
                         name_temp = empresa_tradeName
@@ -93,7 +92,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         # Loop para coletar dados dos Titulares
                         if empresa_student != []:
                             for titular in listaTitulares:
-                                titular_firstName = titular['firstName']
+                                titular_firstName = titular['firstName'].upper()
                                 titular_lastName = titular['lastName']
                                 titular_status = titular['status']
                                 titular_startValidity = titular['startValidity']
@@ -109,12 +108,13 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                     if titular_companyCNPJ == empresa_cnpj:
                                         entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%dT%H:%M:%S.%fZ') #Data que o aluno iniciou na empresa | 2023-12-05
                                         entrada_aluno_date = entrada_titular.date() #Entrada de aluno em Data 05/12/2023
-                                        contador_titulares_empresa += 1
-                                        soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
+                                        
                                         # print(titular_status, titular_studentAgreement_value)
                                         
                                         if emissao_menos_mes < entrada_aluno_date:
                                             valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
+                                            if valor_calculo_prorata > 0:
+                                                titular_studentAgreement_value = 0
                                             valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
                                             contador_titulares_prorata += 1
                                             soma_valor_titulares_prorata += float(titular_studentAgreement_value)
@@ -126,6 +126,9 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                 })
 
                                         else:
+                                            contador_titulares_empresa += 1
+                                            soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
+                                            
                                             valor_mensal_titular = titular_studentAgreement_value
                                             dados_extrato.append({
                                                     "name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": 0,
@@ -136,7 +139,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                         
                                         # Loop para coletar dados dos Dependentes dos titulares
                                         for dependente in listaDependentes:
-                                            dependente_firstName = dependente['firstName']
+                                            dependente_firstName = dependente['firstName'].upper()
                                             dependente_lastName = dependente['lastName']
                                             dependente_status = dependente['status']
                                             dependente_startValidity = dependente['startValidity']
@@ -150,17 +153,19 @@ def FaturarEmpresas(dia_emissao, data_atual):
 
                                             if dependente_status == True and dependente_studentAgreement_type == "FOLHA DE PAGAMENTO":
                                                 if dependente_student_cpf == titular_cpf:
-                                                    contador_dependentes_empresa += 1
-                                                    soma_valor_mensalidade_dependentes += float(dependente_studentAgreement_value)
 
                                                     entrada_dependente = datetime.strptime(dependente_startValidity, '%Y-%m-%dT%H:%M:%S.%fZ') #Data que o aluno iniciou na empresa | 2023-10-01
                                                     entrada_aluno_date = entrada_dependente.date() #Entrada de aluno em Data 01/10/2023
                                             
                                                     if emissao_menos_mes < entrada_aluno_date:
-                                                        soma_valor_dependentes_prorata += float(dependente_studentAgreement_value)
-                                                        contador_dependentes_prorata += 1
                                                         valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
-                                                        valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
+                                                        if valor_calculo_prorata > 0:
+                                                            dependente_studentAgreement_value = 0
+                                                            
+                                                        soma_valor_dependentes_prorata += float(valor_calculo_prorata)
+                                                        contador_dependentes_prorata += 1
+                                                        valor_mensal_dependente = float(dependente_studentAgreement_value) + float(valor_calculo_prorata)
+                                                        
                                                         try:
                                                             dados_extrato.append({
                                                                 "name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": float(valor_calculo_prorata),
@@ -170,6 +175,9 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                             print(dependente_firstName)
 
                                                     else:
+                                                        contador_dependentes_empresa += 1
+                                                        soma_valor_mensalidade_dependentes += float(dependente_studentAgreement_value)
+                                                        
                                                         valor_mensal_dependente = dependente_studentAgreement_value
                                                         
                                                         dados_extrato.append({
@@ -199,6 +207,8 @@ def FaturarEmpresas(dia_emissao, data_atual):
 
                         if grupo_billingType == 'APARTADO':
                             print(f"Valor do boleto apartado: {valor_boleto_empresa}")
+                            # print(dados_extrato)
+                            # print(dados_relatorio)
                             GenerateInvoicing(valor_boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
                         elif grupo_billingType == 'UNIFICADO':
