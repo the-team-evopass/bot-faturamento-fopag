@@ -70,7 +70,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         soma_valor_titulares_prorata, soma_valor_dependentes_prorata, soma_valor_mensalidade_titulares, soma_valor_mensalidade_dependentes = 0, 0, 0, 0
 
                         # Filtro das empresas que têm a data de corte igual ao dia atual
-                        print(colored(f"Faturamento da empresa {empresa_tradeName}.", 'blue'))
+                        print(colored(f"Faturamento da empresa {empresa_tradeName} - {grupo_billingType}.", 'blue'))
 
                         # Tratamento de dados das datas de emissão de boleto e data start do aluno
                         data_atual = datetime.now()
@@ -118,7 +118,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                             valor_mensal_titular = float(titular_studentAgreement_value) + float(valor_calculo_prorata)
                                             contador_titulares_prorata += 1
                                             soma_valor_titulares_prorata += float(titular_studentAgreement_value)
-                                            print(soma_valor_titulares_prorata)
+                                            # print(soma_valor_titulares_prorata)
                                             
                                             dados_extrato.append({
                                                     "name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": float(valor_calculo_prorata),
@@ -206,19 +206,19 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         # print(valor_boleto_empresa)
 
                         if grupo_billingType == 'APARTADO':
-                            print(f"Valor do boleto apartado: {valor_boleto_empresa}")
+                            print(colored(f"Valor do boleto apartado: {valor_boleto_empresa}", "green"))
                             # print(dados_extrato)
                             # print(dados_relatorio)
                             GenerateInvoicing(valor_boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
                         elif grupo_billingType == 'UNIFICADO':
-                            print(f"Valor do boleto unificado: {valor_boleto_empresa}")
                             valor_boleto_grupo += (valor_boleto_empresa)
-                            print(f"Valor do boleto unificado: {valor_boleto_grupo}")
 
                             if qnt_empresas == contador_empresas_grupo:
-                                print(f'valor do boleto do grupo unificado: { valor_boleto_grupo}\n')
-                                print(f"O id do boleto é {id_temp}")
-                                print(f"O nome do boleto é {name_temp}")
+                                print(colored(f'valor do boleto do grupo unificado: { valor_boleto_grupo}\n', 'green'))
+                                # print(f"O id do boleto é {id_temp}")
+                                # print(f"O nome do boleto é {name_temp}")
+                                # print(dados_extrato)
+                                # print(dados_relatorio)
                                 GenerateInvoicing(valor_boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
            
