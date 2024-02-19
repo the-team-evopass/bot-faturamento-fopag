@@ -2,6 +2,7 @@ from termcolor import colored
 from functions.calculation.calculoprorata import calcular_prorata
 from functions.calculation.datavencimento import calcular_data_vencimento
 from datetime import datetime, timedelta
+from functions.calculation.porcentagem import Abatimento_Imposto
 from functions.generateInvoicing import GenerateInvoicing
 from middleware import runGetAllDependents, runGetAllEconomicsGroups, runGetAllHolders
 from functions.render import render_html
@@ -48,6 +49,10 @@ def FaturarEmpresas(dia_emissao, data_atual):
                 empresa_agreement = empresa['companyAgreements']
                 for agreements in empresa_agreement:
                     empresa_value = agreements['value']
+                # empresa_address =  empresa['companyAddress']
+                # for address in empresa_address:
+                #     empresa_cep = address['cep']
+                    
                 dados_extrato = []
                 dados_relatorio = []
 
@@ -204,6 +209,12 @@ def FaturarEmpresas(dia_emissao, data_atual):
 
                         valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
                         # print(valor_boleto_empresa)
+                        
+                        if empresa_id == 2254 or empresa_id == 2214:
+                            imposto = 0.025
+                            resultado = Abatimento_Imposto(valor_boleto_empresa, imposto)
+                            valor_boleto_empresa = resultado
+                            
 
                         if grupo_billingType == 'APARTADO':
                             print(colored(f"Valor do boleto apartado: {valor_boleto_empresa}", "green"))
