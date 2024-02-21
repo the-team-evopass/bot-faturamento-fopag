@@ -224,9 +224,9 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         lista_json = json.dumps(lista, indent=2)
 
                         if grupo_billingType == 'APARTADO':
-                            # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
-                            # print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
-                            GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
+                            print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
+                            print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
+                            # GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
                         elif grupo_billingType == 'UNIFICADO':
                             boleto_grupo += boleto_empresa
@@ -234,7 +234,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                             if qnt_empresas == contador_empresas_grupo:
                                 boleto_empresa = boleto_grupo
                                 
-                                # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
-                                # print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
-                                GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
+                                print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
+                                print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
+                                # GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
            
