@@ -40,8 +40,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
         for empresa in grupo_companies:
             cnpj_empresa_grupo = empresa['cnpj']
             tradeName_empresa_grupo = empresa['tradeName']
-            
-            
 
             for empresa in listaEmpresas:
                 empresa_id = empresa['id']
@@ -63,7 +61,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         id_temp = empresa_id
                         name_temp = empresa_tradeName
                         
-                    if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id != 2214:
+                    if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id not in [2214, 2254]:
                         contagem_value_titular, contagem_value_dependente = 0, 0
                         contagem_value_titular_prorata, contagem_value_dependente_prorata = 0, 0
 
