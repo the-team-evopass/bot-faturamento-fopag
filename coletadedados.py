@@ -99,7 +99,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                             for titular in listaTitulares:
                                 titular_id = titular['id']
                                 titular_firstName = titular['firstName'].upper()
-                                titular_lastName = titular['lastName']
+                                titular_lastName = titular['lastName'].upper()
                                 titular_status = titular['status']
                                 titular_startValidity = titular['startValidity']
                                 titular_cpf = titular['cpf']
@@ -153,7 +153,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                         for dependente in listaDependentes:
                                             dependente_id = dependente['id']
                                             dependente_firstName = dependente['firstName'].upper()
-                                            dependente_lastName = dependente['lastName']
+                                            dependente_lastName = dependente['lastName'].upper()
                                             dependente_status = dependente['status']
                                             dependente_startValidity = dependente['startValidity']
                                             # dependente_cpf = dependente['cpf']
