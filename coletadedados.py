@@ -57,15 +57,13 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         name_temp = empresa_tradeName
                         
                     # Filtro das empresas que têm a data de corte igual ao dia atual
-                    if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id not in [2214, 2254]:
+                    if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id not in [2214, 2314, 2454, 2464 ]:
                         contagem_value_titular, contagem_value_dependente = 0, 0
                         contagem_value_titular_prorata, contagem_value_dependente_prorata = 0, 0
                         contador_titulares_empresa, contador_titulares_prorata = 0, 0
 
                         contador_empresas_grupo += 1
                         contador_empresas += 1
-
-                        soma_valor_titulares_prorata, soma_valor_dependentes_prorata, soma_valor_mensalidade_titulares, soma_valor_mensalidade_dependentes = 0, 0, 0, 0
                         
                         print(colored(f"Faturamento da empresa {empresa_tradeName} - {grupo_billingType}.", 'blue'))
                         
@@ -74,6 +72,13 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         data_emissao_date = data_emissao.date()
 
                         emissao_menos_mes = data_emissao_date - timedelta(days=30) 
+
+                        dias_adicionais = 10
+
+                        # Data de vencimento da cobrança
+                        data_vencimento = calcular_data_vencimento(empresa_cutoffDate, dias_adicionais)
+
+                        competencia_mes_ano = data_emissao_date.strftime('%B de %Y')
 
                         contador_dependentes_prorata = 0
                         contador_dependentes_empresa = 0
@@ -115,7 +120,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
 
                                         else:
                                             contador_titulares_empresa += 1
-                                            soma_valor_mensalidade_titulares += float(titular_studentAgreement_value)
                                             
                                             valor_mensal_titular = titular_studentAgreement_value
                                             
@@ -149,7 +153,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                         if valor_calculo_prorata > 0:
                                                             dependente_studentAgreement_value = 0
                                                             
-                                                        soma_valor_dependentes_prorata += float(valor_calculo_prorata)
                                                         contador_dependentes_prorata += 1
                                                         valor_mensal_dependente_prorata = float(valor_calculo_prorata)
                                                         contagem_value_dependente_prorata += float(valor_mensal_dependente_prorata)
@@ -164,7 +167,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
 
                                                     else:
                                                         contador_dependentes_empresa += 1
-                                                        soma_valor_mensalidade_dependentes += float(dependente_studentAgreement_value)
                                                         
                                                         valor_mensal_dependente = dependente_studentAgreement_value
                                                         
@@ -206,34 +208,33 @@ def FaturarEmpresas(dia_emissao, data_atual):
                             dados_relatorio[3]['quantity'] = dados_relatorio[3]['quantity'] + float(contador_dependentes_empresa)
                             dados_relatorio[3]['value'] = dados_relatorio[3]['value'] + float(contagem_value_dependente)
 
-                        boleto_empresa = float(empresa_value) + float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
+                        boleto_empresa = float(empresa_value) + float(contagem_value_titular_prorata) + float(contagem_value_titular) + float(contagem_value_dependente_prorata) + float(contagem_value_dependente)
+                        # print(f"Valor de Vida: {empresa_value}, Valor Prorata Titular: {contagem_value_titular_prorata}, Valor Mensal Titular: {contagem_value_titular}, 
+                        #       Valor Prorata Dependentes:{contagem_value_dependente_prorata}, Valor Mensal Dependente{contagem_value_dependente}")
 
-                        valor_soma_total = float(soma_valor_titulares_prorata) + float(soma_valor_mensalidade_titulares) + float(soma_valor_dependentes_prorata) + float(soma_valor_mensalidade_dependentes)
+                        valor_soma_total = float(contagem_value_titular_prorata) + float(contagem_value_titular) + float(contagem_value_dependente_prorata) + float(contagem_value_dependente)
                         # print(boleto_empresa)
                         
-                        if empresa_id == 2254 or empresa_id == 2214:
+                        if empresa_id == 2254:
                             imposto = 0.025
-                            resultado = Abatimento_Imposto(valor_boleto_empresa, imposto)
-                            valor_boleto_empresa = resultado
-                            
+                            resultado = Abatimento_Imposto(boleto_empresa, imposto)
+                            boleto_empresa = resultado
+                        
+                        lista = {"Extrato": dados_extrato,"Relatorio": dados_relatorio}
+                        lista_json = json.dumps(lista, indent=2)
 
                         if grupo_billingType == 'APARTADO':
-                            extrato = json.dumps(dados_extrato, indent=2)
-                            relatorio = json.dumps(dados_relatorio, indent=2)
-                            print(colored(f"ID: {id_temp} | Nome: {name_temp}\nEXTRATO:\n{extrato}\nRELATORIO:\n{relatorio}", "yellow"))
-                            print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
-
-                            # GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
+                            # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
+                            # print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
+                            GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
                         elif grupo_billingType == 'UNIFICADO':
                             boleto_grupo += boleto_empresa
                             
                             if qnt_empresas == contador_empresas_grupo:
                                 boleto_empresa = boleto_grupo
-                                extrato = json.dumps(dados_extrato, indent=2)
-                                relatorio = json.dumps(dados_relatorio, indent=2)
-                                print(colored(f"ID: {id_temp} | Nome: {name_temp}\nEXTRATO:\n{extrato}\nRELATORIO:\n{relatorio}", "yellow"))
-                                print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
-
-                                # GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
+                                
+                                # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
+                                # print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
+                                GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
            

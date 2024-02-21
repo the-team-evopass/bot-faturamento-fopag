@@ -1,7 +1,6 @@
 from datetime import datetime
 from coletadedados import FaturarEmpresas
 
-#Substituir por datetime.now() e extrair o dia
 dia_emissao = 20
 data_atual = datetime.now()
 
