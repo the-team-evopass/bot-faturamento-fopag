@@ -4,9 +4,9 @@ from functions.asaas.criarCobranca import criar_cobranca
 from middleware import runGenerateExtractRequest, runGenerateIssueNf
 
 
-def GenerateInvoicing(valor_boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName):
-    if valor_boleto_empresa != 0:
-        billingResponse = criar_cobranca(empresa_cnpj, valor_boleto_empresa, data_vencimento)
+def GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName):
+    if boleto_empresa != 0:
+        billingResponse = criar_cobranca(empresa_cnpj, boleto_empresa, data_vencimento)
         
         print(colored(billingResponse['billingURL'], 'green'))
 
@@ -18,7 +18,7 @@ def GenerateInvoicing(valor_boleto_empresa, empresa_cnpj, data_vencimento,compet
         '''
 
         # Função para emissão de NF
-        runGenerateIssueNf(billingResponse['billingID'], valor_boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
+        runGenerateIssueNf(billingResponse['billingID'], boleto_empresa, datetime.now().strftime('%Y-%m-%d'))
 
         #Estou gerando o PDF aqui
         runGenerateExtractRequest(competencia_mes_ano, data_vencimento, dados_extrato, dados_relatorio, valor_soma_total, empresa_id, extractObservation, billingResponse['billingURL'], empresa_tradeName, empresa_cnpj)
