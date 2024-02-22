@@ -6,7 +6,10 @@ def calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia):
     if entrada_aluno_date.month in meses_31:
         valor_pro_rata -= valor_por_dia
         
-    elif entrada_aluno_date.month == 2: # data vigente no mes com menos de 30 dias
-        valor_pro_rata += (valor_por_dia * 3)
-    
+    elif entrada_aluno_date.month == 2 and entrada_aluno_date.year == 2024: # data vigente no mes com menos de 30 dias
+        valor_pro_rata += valor_por_dia
+        
+    elif entrada_aluno_date.month == 2 and entrada_aluno_date.year == 2025: # data vigente no mes com menos de 30 dias
+        valor_pro_rata += (valor_por_dia * 2)
+        
     return valor_pro_rata

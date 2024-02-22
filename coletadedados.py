@@ -1,4 +1,6 @@
+from calendar import month
 import json
+from os import replace
 from termcolor import colored
 from functions.calculation.calculoprorata import calcular_prorata
 from functions.calculation.datavencimento import calcular_data_vencimento
@@ -70,8 +72,8 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         data_atual = datetime.now()
                         data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate)
                         data_emissao_date = data_emissao.date()
-
-                        emissao_menos_mes = data_emissao_date - timedelta(days=30) 
+                        
+                        emissao_menos_mes = (data_emissao_date.replace(year=data_emissao_date.year - 1, month=12) if data_emissao_date.month == 1 else data_emissao_date.replace(month=data_emissao_date.month - 1))
 
                         dias_adicionais = 10
 
@@ -101,7 +103,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                     if titular_companyCNPJ == empresa_cnpj:
                                         entrada_titular = datetime.strptime(titular_startValidity, '%Y-%m-%dT%H:%M:%S.%fZ')
                                         entrada_aluno_date = entrada_titular.date()
-                                        
+                                                                                
                                         if emissao_menos_mes < entrada_aluno_date:
                                             valor_calculo_prorata = calcular_prorata(data_emissao_date, entrada_aluno_date, valor_por_dia)
 
@@ -111,10 +113,8 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                             valor_mensal_titular_prorata = float(valor_calculo_prorata)
                                             contador_titulares_prorata += 1
                                             
-                                            dados_extrato.append({
-                                                    "name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": float(valor_calculo_prorata),
-                                                    "value":  float(titular_studentAgreement_value),"totalValue": float(valor_mensal_titular_prorata)
-                                                })
+                                            dados_extrato.append({"name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": float(valor_calculo_prorata),
+                                                    "value":  float(titular_studentAgreement_value),"totalValue": float(valor_mensal_titular_prorata)})
                                             
                                             contagem_value_titular_prorata += float(valor_mensal_titular_prorata)
 
@@ -123,10 +123,8 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                             
                                             valor_mensal_titular = titular_studentAgreement_value
                                             
-                                            dados_extrato.append({
-                                                    "name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": 0,
-                                                    "value":  float(titular_studentAgreement_value),"totalValue": float(valor_mensal_titular)
-                                                })
+                                            dados_extrato.append({"name": titular_firstName + " " + titular_lastName,"relationship": "TITULAR","cpf": titular_cpf,"proRata": 0,
+                                                    "value":  float(titular_studentAgreement_value),"totalValue": float(valor_mensal_titular)})
 
                                             contagem_value_titular += float(valor_mensal_titular)
                                         
@@ -158,10 +156,8 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                         contagem_value_dependente_prorata += float(valor_mensal_dependente_prorata)
                                                         
                                                         try:
-                                                            dados_extrato.append({
-                                                                "name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": float(valor_calculo_prorata),
-                                                                "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente_prorata)
-                                                            })
+                                                            dados_extrato.append({"name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": float(valor_calculo_prorata),
+                                                                "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente_prorata)})
                                                         except:
                                                             print(dependente_firstName)
 
@@ -170,30 +166,17 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                         
                                                         valor_mensal_dependente = dependente_studentAgreement_value
                                                         
-                                                        dados_extrato.append({
-                                                            "name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": 0,
-                                                            "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)
-                                                        })
+                                                        dados_extrato.append({"name": dependente_firstName + " " + dependente_lastName, "relationship": "DEPENDENTE", "cpf": titular_cpf, "proRata": 0,
+                                                            "value":  float(dependente_studentAgreement_value), "totalValue": float(valor_mensal_dependente)})
 
                                                         contagem_value_dependente += float(valor_mensal_dependente)
 
                         if dados_relatorio == []:  
 
-                            dados_relatorio.append({
-                                "reference": "Pro rata - Titulares", "quantity": float(contador_titulares_prorata), "value": float(contagem_value_titular_prorata)
-                            })
-                            dados_relatorio.append({
-                                "reference": "Mensalidade  - Titulares", "quantity": float(contador_titulares_empresa), "value": float(contagem_value_titular)
-                            })
-                            dados_relatorio.append({
-                                "reference": "Pro rata - Dependentes", "quantity": float(contador_dependentes_prorata), "value": float(contagem_value_dependente_prorata)
-                            })
-                            dados_relatorio.append(
-                                
-                            {
-                                "reference": "Mensalidade - Dependentes", "quantity": float(contador_dependentes_empresa),"value": float(contagem_value_dependente)
-                            }
-                            )
+                            dados_relatorio.append({"reference": "Pro rata - Titulares", "quantity": float(contador_titulares_prorata), "value": float(contagem_value_titular_prorata)})
+                            dados_relatorio.append({"reference": "Mensalidade  - Titulares", "quantity": float(contador_titulares_empresa), "value": float(contagem_value_titular)})
+                            dados_relatorio.append({"reference": "Pro rata - Dependentes", "quantity": float(contador_dependentes_prorata), "value": float(contagem_value_dependente_prorata)})
+                            dados_relatorio.append({"reference": "Mensalidade - Dependentes", "quantity": float(contador_dependentes_empresa),"value": float(contagem_value_dependente)})
                         else:
                             # OBJ PRORATA TITULARES
                             dados_relatorio[0]['quantity'] = dados_relatorio[0]['quantity'] + float(contador_titulares_prorata)
@@ -224,17 +207,16 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         lista_json = json.dumps(lista, indent=2)
 
                         if grupo_billingType == 'APARTADO':
-                            print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
-                            print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
-                            # GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
+                            # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
+                            # print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
+                            GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
                         elif grupo_billingType == 'UNIFICADO':
                             boleto_grupo += boleto_empresa
                             
                             if qnt_empresas == contador_empresas_grupo:
                                 boleto_empresa = boleto_grupo
-                                
-                                print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
-                                print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
-                                # GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
+                                # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
+                                # print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
+                                GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
            

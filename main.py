@@ -1,7 +1,7 @@
 from datetime import datetime
 from coletadedados import FaturarEmpresas
 
-dia_emissao = 20
+dia_emissao = 25
 data_atual = datetime.now()
 
 def Faturar(dia_emissao, data_atual):
