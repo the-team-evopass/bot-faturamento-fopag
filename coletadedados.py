@@ -212,7 +212,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         lista = {"Extrato": dados_extrato,"Relatorio": dados_relatorio}
                         lista_json = json.dumps(lista, indent=2)
 
-                        if grupo_billingType == 'APARTADO' and empresa_id != 2494:
+                        if grupo_billingType == 'APARTADO':
                             # print(empresa_tradeName, empresa_id)
                             # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
                             # print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
@@ -223,6 +223,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                             
                             if qnt_empresas == contador_empresas_grupo:
                                 boleto_empresa = boleto_grupo
+                                # print(empresa_tradeName, empresa_id)
                                 # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
                                 # print(colored(f'Valor do boleto do grupo unificado: {boleto_grupo}\n', 'green'))
                                 GenerateInvoicing(boleto_empresa, grupo_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,id_temp,name_temp)
