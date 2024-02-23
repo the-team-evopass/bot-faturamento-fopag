@@ -32,10 +32,12 @@ def FaturarEmpresas(dia_emissao, data_atual):
         grupo_billingType = grupo['billingType']
         grupo_companies = grupo['companies']
 
-        dados_extrato = []
-        dados_relatorio = []
         boleto_grupo = 0
         contador_empresas_grupo = 0
+
+        if grupo_billingType == "UNIFICADO":
+            dados_extrato = []
+            dados_relatorio = []    
 
         qnt_empresas = len(grupo_companies)
 
@@ -52,11 +54,16 @@ def FaturarEmpresas(dia_emissao, data_atual):
                 empresa_agreement = empresa['companyAgreements']
                 for agreements in empresa_agreement:
                     empresa_value = agreements['value']
+                
+                if grupo_billingType == "APARTADO":
+                    dados_extrato = []
+                    dados_relatorio = []
 
                 if empresa_cnpj in cnpj_empresa_grupo:
                     if empresa_cnpj == grupo_cnpj:
                         id_temp = empresa_id
                         name_temp = empresa_tradeName
+                        
                         
                     # Filtro das empresas que têm a data de corte igual ao dia atual
                     if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id not in [2214, 2314, 2454, 2464 ]:
@@ -172,7 +179,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                                         contagem_value_dependente += float(valor_mensal_dependente)
 
                         if dados_relatorio == []:  
-
                             dados_relatorio.append({"reference": "Pro rata - Titulares", "quantity": float(contador_titulares_prorata), "value": float(contagem_value_titular_prorata)})
                             dados_relatorio.append({"reference": "Mensalidade  - Titulares", "quantity": float(contador_titulares_empresa), "value": float(contagem_value_titular)})
                             dados_relatorio.append({"reference": "Pro rata - Dependentes", "quantity": float(contador_dependentes_prorata), "value": float(contagem_value_dependente_prorata)})
