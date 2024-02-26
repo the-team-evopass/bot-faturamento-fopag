@@ -64,7 +64,6 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         id_temp = empresa_id
                         name_temp = empresa_tradeName
                         
-                        
                     # Filtro das empresas que têm a data de corte igual ao dia atual
                     if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id not in [2214, 2314, 2454, 2464 ]:
                         contagem_value_titular, contagem_value_dependente = 0, 0
