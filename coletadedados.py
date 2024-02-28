@@ -81,7 +81,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         
                         emissao_menos_mes = (data_emissao_date.replace(year=data_emissao_date.year - 1, month=12) if data_emissao_date.month == 1 else data_emissao_date.replace(month=data_emissao_date.month - 1))
 
-                        dias_adicionais = 10
+                        dias_adicionais = 11
 
                         # Data de vencimento da cobrança
                         data_vencimento = calcular_data_vencimento(empresa_cutoffDate, dias_adicionais)
