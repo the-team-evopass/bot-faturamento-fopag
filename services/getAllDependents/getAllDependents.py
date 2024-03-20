@@ -1,9 +1,8 @@
-import json
 import requests
 
 def getAllDependents (baseURL): 
 
-    url = f'{baseURL}/dependent?expand=student%2CdependentContact%2CdependentAgreement%2CdependentAddress'
+    url = f'{baseURL}/dependent?include=contacts,agreements,holder,companies,addresses'
 
     payload = {}
     headers = {}

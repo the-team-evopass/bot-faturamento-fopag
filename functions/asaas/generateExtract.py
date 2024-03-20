@@ -4,7 +4,7 @@ import json
 
 def generateExtractRequest(baseURL, competence, due_date, students, summary, total_amount, idCompany, instructions, invoiceUrl, tradeName, cnpj):
 
-    url = f"{baseURL}/generate_pdf/?id={idCompany}"
+    url = f"{baseURL}/list-of-assets/?id={idCompany}"
 
     payload = json.dumps({
         "competence": competence,

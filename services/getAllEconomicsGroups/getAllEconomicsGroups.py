@@ -1,7 +1,7 @@
 import requests
 
 def getAllEconomicsGroups(baseURL):
-        url = f'{baseURL}/economic_group/company'
+        url = f'{baseURL}/economic_group?include=companies'
         payload = {}
         headers = {}
         response = requests.request('GET', url, headers=headers, data=payload)

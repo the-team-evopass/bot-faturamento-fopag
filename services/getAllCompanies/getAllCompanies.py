@@ -1,9 +1,8 @@
-import json
 import requests
 
 def getAllCompanies (baseURL): 
 
-    url = f'{baseURL}/company?expand=companyContacts%2CcompanyAddress%2CcompanyAgreements%2Cstudents'
+    url = f'{baseURL}/company?include=holders,agreements,contacts,addresses'
 
     payload = {}
     headers = {}

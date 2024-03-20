@@ -4,7 +4,7 @@ def DeleteBilling(id_cobranca):
     url = f'https://sandbox.asaas.com/api/v3/payments/{id_cobranca}'
     headers = {
         "accept": "application/json",
-        "access_token": "$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoXzk5ZDg3ZGJlLWM2NmYtNGFjMS1hNTdmLWM5YjlhYmVlNDVmNA==" 
+        "access_token": "$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoXzViZjJiMzRmLTU5MDEtNGFjOC1iOGFjLTUwYTIyYWU3NjRjOQ==" 
     }
     resposta_delete_cobranca = requests.delete(url, headers=headers)
 
@@ -17,7 +17,7 @@ def ListAndDeleteBilling():
     url = 'https://sandbox.asaas.com/api/v3/payments'
     headers = {
         "accept": "application/json",
-        "access_token": "$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoXzk5ZDg3ZGJlLWM2NmYtNGFjMS1hNTdmLWM5YjlhYmVlNDVmNA=="  
+        "access_token": "$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTg2MTM6OiRhYWNoXzViZjJiMzRmLTU5MDEtNGFjOC1iOGFjLTUwYTIyYWU3NjRjOQ=="  
     }
 
     limite_pag = 100

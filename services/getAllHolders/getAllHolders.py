@@ -1,9 +1,8 @@
-import json
 import requests
 
 def getAllHolders (baseURL): 
 
-    url = f'{baseURL}/student?expand=dependents%2CstudentContact%2CstudentAgreement%2CstudentAddress%2Ccompany'
+    url = f'{baseURL}/holder?include=dependents,contacts,agreements,addresses,companies'
 
     payload = {}
     headers = {}

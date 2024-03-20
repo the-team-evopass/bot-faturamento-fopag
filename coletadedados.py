@@ -18,8 +18,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
     dados_relatorio = []
     
     listaGruposEconomicos = runGetAllEconomicsGroups()
-    respostaAllCompany = runGetAllCompanies()
-    listaEmpresas = respostaAllCompany['data']
+    listaEmpresas = runGetAllCompanies()
     listaTitulares = runGetAllHolders()
     listaDependentes = runGetAllDependents()
 
@@ -29,13 +28,13 @@ def FaturarEmpresas(dia_emissao, data_atual):
     # Grupos Economicos
     for grupo in listaGruposEconomicos:
         grupo_cnpj = grupo['cnpj']
-        grupo_billingType = grupo['billingType']
+        grupo_isUnifiedBoleto = grupo['isUnifiedBoleto']
         grupo_companies = grupo['companies']
 
         boleto_grupo = 0
         contador_empresas_grupo = 0
 
-        if grupo_billingType == "UNIFICADO":
+        if grupo_isUnifiedBoleto == "UNIFICADO":
             dados_extrato = []
             dados_relatorio = []    
 
@@ -50,12 +49,12 @@ def FaturarEmpresas(dia_emissao, data_atual):
                 empresa_tradeName = empresa['tradeName']  # Nome da empresa
                 empresa_companyStatus = empresa['companyStatus']  # Status da empresa
                 empresa_cutoffDate = empresa['cutoffDate']  # Data corte
-                empresa_students = empresa['students']
-                empresa_agreement = empresa['companyAgreements']
+                empresa_students = empresa['holders']
+                empresa_agreement = empresa['agreements']
                 for agreements in empresa_agreement:
                     empresa_value = agreements['value']
                 
-                if grupo_billingType == "APARTADO":
+                if grupo_isUnifiedBoleto == "APARTADO":
                     dados_extrato = []
                     dados_relatorio = []
 
@@ -65,7 +64,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         name_temp = empresa_tradeName
                         
                     # Filtro das empresas que têm a data de corte igual ao dia atual
-                    if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate and empresa_id not in [2214, 2314, 2454, 2464 ]:
+                    if empresa_companyStatus == "EM IMPLANTACAO" and dia_emissao == empresa_cutoffDate:
                         contagem_value_titular, contagem_value_dependente = 0, 0
                         contagem_value_titular_prorata, contagem_value_dependente_prorata = 0, 0
                         contador_titulares_empresa, contador_titulares_prorata = 0, 0
@@ -73,7 +72,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         contador_empresas_grupo += 1
                         contador_empresas += 1
                         
-                        print(colored(f"Faturamento da empresa {empresa_tradeName} - {grupo_billingType}.", 'blue'))
+                        print(colored(f"Faturamento da empresa {empresa_tradeName} - {grupo_isUnifiedBoleto}.", 'blue'))
                         
                         data_atual = datetime.now()
                         data_emissao = datetime(data_atual.year, data_atual.month, empresa_cutoffDate)
@@ -100,8 +99,8 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                 titular_startValidity = titular['startValidity']
                                 titular_cpf = titular['cpf']
                                 titular_companyCNPJ = titular['company']['cnpj']
-                                titular_studentAgreement_value = titular['studentAgreement'][-1]['value']
-                                titular_studentAgreement_type = titular['studentAgreement'][-1]['type']
+                                titular_studentAgreement_value = titular['agreements'][-1]['value']
+                                titular_studentAgreement_type = titular['agreements'][-1]['type']
 
                                 valor_por_dia = float(titular_studentAgreement_value) / float(30.0)  # valor cobrado por dia
                                     
@@ -140,9 +139,9 @@ def FaturarEmpresas(dia_emissao, data_atual):
                                             dependente_lastName = dependente['lastName'].upper()
                                             dependente_status = dependente['status']
                                             dependente_startValidity = dependente['startValidity']
-                                            dependente_student_cpf = dependente['student']['cpf']
-                                            dependente_studentAgreement_value = dependente['dependentAgreement'][-1]['value']
-                                            dependente_studentAgreement_type = dependente['dependentAgreement'][-1]['type']
+                                            dependente_student_cpf = dependente['holder']['cpf']
+                                            dependente_studentAgreement_value = dependente['agreements'][-1]['value']
+                                            dependente_studentAgreement_type = dependente['agreements'][-1]['type']
                                             dependente_startValidity = dependente['startValidity']
 
                                             valor_por_dia = float(dependente_studentAgreement_value) / float(30.0)  # valor cobrado por dia
@@ -203,21 +202,26 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         valor_soma_total = float(contagem_value_titular_prorata) + float(contagem_value_titular) + float(contagem_value_dependente_prorata) + float(contagem_value_dependente)
                         # print(boleto_empresa)
                         
-                        if empresa_id == 2254:
+                        if empresa_id == 2254 or empresa_id == 2234:
                             imposto = 0.025
+                            resultado = Abatimento_Imposto(boleto_empresa, imposto)
+                            boleto_empresa = resultado
+                            
+                        elif empresa_id == 2214:
+                            imposto = 0.015
                             resultado = Abatimento_Imposto(boleto_empresa, imposto)
                             boleto_empresa = resultado
                         
                         lista = {"Extrato": dados_extrato,"Relatorio": dados_relatorio}
                         lista_json = json.dumps(lista, indent=2)
 
-                        if grupo_billingType == 'APARTADO':
+                        if grupo_isUnifiedBoleto == 'APARTADO':
                             # print(empresa_tradeName, empresa_id)
                             # print(colored(f"ID: {id_temp} | Nome: {name_temp} | PDF:\n{lista_json}", "yellow"))
                             # print(colored(f'Valor do boleto do grupo apartado: {boleto_empresa}\n', 'green'))
                             GenerateInvoicing(boleto_empresa, empresa_cnpj, data_vencimento,competencia_mes_ano,dados_extrato,dados_relatorio,valor_soma_total,empresa_id,empresa_tradeName)
 
-                        elif grupo_billingType == 'UNIFICADO':
+                        elif grupo_isUnifiedBoleto == 'UNIFICADO':
                             boleto_grupo += boleto_empresa
                             
                             if qnt_empresas == contador_empresas_grupo:
