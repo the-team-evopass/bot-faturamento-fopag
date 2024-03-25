@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from flask import Flask
 from main import FaturarEmpresas
