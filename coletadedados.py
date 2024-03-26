@@ -195,9 +195,14 @@ def FaturarEmpresas(dia_emissao, data_atual):
                             dados_relatorio[3]['quantity'] = dados_relatorio[3]['quantity'] + float(contador_dependentes_empresa)
                             dados_relatorio[3]['value'] = dados_relatorio[3]['value'] + float(contagem_value_dependente)
 
-                        boleto_empresa = float(empresa_value) + float(contagem_value_titular_prorata) + float(contagem_value_titular) + float(contagem_value_dependente_prorata) + float(contagem_value_dependente)
-                        # valor_boleto_vida = (contador_titulares_empresa + contador_titulares_prorata + contador_dependentes_prorata + contador_dependentes_empresa) * empresa_value
-                        # boleto_empresa = valor_boleto_vida
+                        # print(float(contador_titulares_empresa) + float(contador_titulares_prorata) + float(contador_dependentes_prorata) + float(contador_dependentes_empresa) * float(empresa_value))
+                        if empresa_value != 0:
+                            valor_boleto_vida = (float(contador_titulares_empresa) + float(contador_titulares_prorata) + float(contador_dependentes_prorata) + float(contador_dependentes_empresa)) * float(empresa_value)
+                            boleto_empresa = float(contagem_value_titular_prorata) + float(contagem_value_titular) + float(contagem_value_dependente_prorata) + float(contagem_value_dependente) + float(valor_boleto_vida)
+                        else:
+                            boleto_empresa = float(contagem_value_titular_prorata) + float(contagem_value_titular) + float(contagem_value_dependente_prorata) + float(contagem_value_dependente)
+                        # print(valor_boleto_vida)
+
                         # print(f"Valor de Vida: {empresa_value}, Valor Prorata Titular: {contagem_value_titular_prorata}, Valor Mensal Titular: {contagem_value_titular}, 
                         #       Valor Prorata Dependentes:{contagem_value_dependente_prorata}, Valor Mensal Dependente{contagem_value_dependente}")
 
@@ -219,7 +224,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         
                         if contador_dependentes_empresa != 0 or contador_dependentes_prorata != 0 or contador_titulares_empresa != 0 or contador_titulares_prorata != 0:
                             
-                            if empresa_id != 2274 and empresa_id != 2344: #Condição para tirar empresas  
+                            if empresa_id != 2274 and empresa_id != 2344 and empresa_id != 2474 and empresa_id != 2484 and empresa_id != 2494: #Condição para tirar empresas  
                                 
                                 if grupo_isUnifiedBoleto == 'APARTADO':
                                     # print(empresa_tradeName, empresa_id)
