@@ -224,7 +224,7 @@ def FaturarEmpresas(dia_emissao, data_atual):
                         
                         if contador_dependentes_empresa != 0 or contador_dependentes_prorata != 0 or contador_titulares_empresa != 0 or contador_titulares_prorata != 0:
                             
-                            if empresa_id != 2274 and empresa_id != 2344 and empresa_id != 2474 and empresa_id != 2484 and empresa_id != 2494: #Condição para tirar empresas  
+                            # if empresa_id != 2274 and empresa_id != 2344 and empresa_id != 2474 and empresa_id != 2484 and empresa_id != 2494: #Condição para tirar empresas  
                                 
                                 if grupo_isUnifiedBoleto == 'APARTADO':
                                     # print(empresa_tradeName, empresa_id)
